@@ -1,6 +1,16 @@
 package com.etsyclone.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "address")
@@ -23,15 +33,22 @@ public class Address {
     private String zipCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Address() {
+    }
+
+    public Address(String street, String city, String state, String zipCode, User user) {
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.zipCode = zipCode;
+        this.user = user;
+    }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getStreet() {
@@ -66,6 +83,7 @@ public class Address {
         this.zipCode = zipCode;
     }
 
+
     public Long getUserId() {
         return user.getId();
     }
@@ -85,4 +103,16 @@ public class Address {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(getStreet(), address.getStreet()) && Objects.equals(getCity(), address.getCity()) && Objects.equals(getState(), address.getState()) && Objects.equals(getZipCode(), address.getZipCode()) && Objects.equals(user, address.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getStreet(), getCity(), getState(), getZipCode(), user);
+    }
 }

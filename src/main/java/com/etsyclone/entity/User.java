@@ -3,6 +3,8 @@ package com.etsyclone.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -23,40 +26,38 @@ public class User {
     @Column(name = "user_name", nullable = false, length = 50)
     private String userName;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
-    @Column(length = 10)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRoles role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Address> addresses = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    public User() {
+    }
+    public User(String userName, String email, String passwordHash, UserRoles role) {
+        this.userName = userName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getId() {
+        return id;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPasswordHash() {
@@ -68,11 +69,15 @@ public class User {
     }
 
     public String getRole() {
-        return role;
+        return role.name();
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRoles role) {
         this.role = role;
+    }
+
+    public Set<Address> getAddresses() {
+        return addresses;
     }
 
     public void addAddress(Address address) {
@@ -81,11 +86,7 @@ public class User {
     }
 
     public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setUser(null);
-    }
-    public String toString() {
-        return "User [id=" + id + ", userName=" + userName + ", email=" + email + ", role=" + role + "]";
+        addresses.remove(address);;
     }
 
     public boolean isSeller() {
@@ -94,5 +95,30 @@ public class User {
 
     public boolean isBuyer() {
         return role.equals("buyer");
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("id=").append(id);
+        sb.append(", userName='").append(userName).append('\'');
+        sb.append(", email='").append(email).append('\'');
+        sb.append(", role=").append(role);
+        sb.append(", addresses=").append(addresses);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userName, user.userName) && Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userName, email);
     }
 }
