@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +15,11 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 
 @Entity
-@Table(name = "order")
+@Table(name = "customer_order")
 public class Order {
 
     @Id
@@ -131,11 +131,15 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equals(user, order.user) && Objects.equals(address, order.address) && Objects.equals(orderItems, order.orderItems);
+        return Objects.equal(user, order.user) && Objects.equal(address, order.address) && Objects.equal(totalPrice, order.totalPrice) && Objects.equal(orderItems, order.orderItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, address, orderItems);
+        int result = Objects.hashCode(user);
+        result = 31 * result + Objects.hashCode(address);
+        result = 31 * result + Objects.hashCode(totalPrice);
+        result = 31 * result + Objects.hashCode(orderItems);
+        return result;
     }
 }

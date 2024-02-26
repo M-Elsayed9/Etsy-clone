@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,12 +20,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private Set<Product> products;
-
 
     public Category() {
     }
@@ -73,15 +72,12 @@ public class Category {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if(o instanceof Category) {
-            Category category = (Category) o;
-            return Objects.equals(name, category.name);
-        }
-        return false;
+        Category category = (Category) o;
+        return Objects.equal(name, category.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hashCode(name);
     }
 }

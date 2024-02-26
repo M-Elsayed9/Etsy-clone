@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Entity
 @Table(name = "product")
@@ -32,6 +32,9 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "stock", nullable = false)
+    private Integer stock;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -46,7 +49,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(String name, String description, BigDecimal price, String imageUrl, Category category, User seller) {
+    public Product(String name, String description, BigDecimal price, String imageUrl, Category category, User seller, Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -55,7 +58,7 @@ public class Product {
         this.seller = seller;
     }
 
-    public Product(String name, String description, BigDecimal price, String imageUrl, User seller) {
+    public Product(String name, String description, BigDecimal price, String imageUrl, User seller, Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -63,14 +66,14 @@ public class Product {
         this.seller = seller;
     }
 
-    public Product(String name, String description, BigDecimal price, Category category, User seller) {
+    public Product(String name, String description, BigDecimal price, Category category, User seller,  Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
     }
 
-    public Product(String name, String description, BigDecimal price, User seller) {
+    public Product(String name, String description, BigDecimal price, User seller, Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -81,12 +84,32 @@ public class Product {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public void addStock(Integer stock) {
+        this.stock += stock;
+    }
+
+    public void removeStock(Integer stock) {
+        this.stock -= stock;
     }
 
     public String getDescription() {
@@ -149,12 +172,14 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equals(name, product.name) && Objects.equals(category, product.category) && Objects.equals(seller, product.seller);
+        return Objects.equal(name, product.name) && Objects.equal(seller, product.seller);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, category, seller);
+        int result = Objects.hashCode(name);
+        result = 31 * result + Objects.hashCode(seller);
+        return result;
     }
 }
 

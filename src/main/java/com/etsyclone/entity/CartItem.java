@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,8 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import java.util.Objects;
 
 @Entity
 @Table(name = "cart_item")
@@ -44,20 +43,32 @@ public class CartItem {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Cart getCart() {
         return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public Product getProduct() {
         return product;
     }
 
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     public Short getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Number quantity) {
-        this.quantity = (Short) quantity;
+    public void setQuantity(Short quantity) {
+        this.quantity = quantity;
     }
 
     public Long getCartId() {
@@ -84,11 +95,13 @@ public class CartItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CartItem cartItem = (CartItem) o;
-        return Objects.equals(cart, cartItem.cart) && Objects.equals(product, cartItem.product);
+        return Objects.equal(cart, cartItem.cart) && Objects.equal(product, cartItem.product);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cart, product);
+        int result = Objects.hashCode(cart);
+        result = 31 * result + Objects.hashCode(product);
+        return result;
     }
 }

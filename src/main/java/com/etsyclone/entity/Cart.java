@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,6 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -46,12 +46,24 @@ public class Cart {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public User getCustomer() {
         return customer;
     }
 
+    public void setCustomer(User customer) {
+        this.customer = customer;
+    }
+
     public Set<CartItem> getItems() {
         return items;
+    }
+
+    public void setItems(Set<CartItem> items) {
+        this.items = items;
     }
 
     public void addItem(CartItem item) {
@@ -72,12 +84,8 @@ public class Cart {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void setItems(Set<CartItem> items) {
-        this.items = items;
-    }
-
-    public void setTotalPrice(Number totalPrice) {
-        this.totalPrice = (BigDecimal) totalPrice;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public void updateItem(CartItem item) {
@@ -114,11 +122,15 @@ public class Cart {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cart cart = (Cart) o;
-        return Objects.equals(getCustomer(), cart.getCustomer());
+        return Objects.equal(customer, cart.customer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer);
+        return Objects.hashCode(customer);
+    }
+
+    public CartItem[] getCartItems() {
+        return items.toArray(new CartItem[0]);
     }
 }

@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Entity
 public class OrderItem {
@@ -23,13 +23,12 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private Short quantity;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -37,7 +36,7 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Product product, Integer quantity, BigDecimal price) {
+    public OrderItem(Order order, Product product, Short quantity, BigDecimal price) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
@@ -48,6 +47,9 @@ public class OrderItem {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Order getOrder() {
         return order;
@@ -61,12 +63,15 @@ public class OrderItem {
         return product;
     }
 
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-    public Integer getQuantity() {
+    public Short getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Short quantity) {
         this.quantity = quantity;
     }
 
@@ -130,11 +135,13 @@ public class OrderItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderItem orderItem = (OrderItem) o;
-        return Objects.equals(order, orderItem.order) && Objects.equals(product, orderItem.product);
+        return Objects.equal(order, orderItem.order) && Objects.equal(product, orderItem.product);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(order, product);
+        int result = Objects.hashCode(order);
+        result = 31 * result + Objects.hashCode(product);
+        return result;
     }
 }

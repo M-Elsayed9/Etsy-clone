@@ -1,5 +1,7 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,8 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import java.util.Objects;
 
 @Entity
 @Table(name = "address")
@@ -51,6 +51,10 @@ public class Address {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getStreet() {
         return street;
     }
@@ -83,9 +87,8 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-
-    public Long getUserId() {
-        return user.getId();
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {
@@ -108,11 +111,16 @@ public class Address {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equals(getStreet(), address.getStreet()) && Objects.equals(getCity(), address.getCity()) && Objects.equals(getState(), address.getState()) && Objects.equals(getZipCode(), address.getZipCode()) && Objects.equals(user, address.user);
+        return Objects.equal(street, address.getStreet()) && com.google.common.base.Objects.equal(city, address.getCity()) && com.google.common.base.Objects.equal(state, address.getState()) && com.google.common.base.Objects.equal(zipCode, address.getZipCode()) && com.google.common.base.Objects.equal(user, address.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getStreet(), getCity(), getState(), getZipCode(), user);
+        int result = Objects.hashCode(street);
+        result = 31 * result + Objects.hashCode(city);
+        result = 31 * result + Objects.hashCode(state);
+        result = 31 * result + Objects.hashCode(zipCode);
+        result = 31 * result + Objects.hashCode(user);
+        return result;
     }
 }

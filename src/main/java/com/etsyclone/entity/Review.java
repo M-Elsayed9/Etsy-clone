@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,8 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-
-import java.util.Objects;
 
 @Entity
 public class Review {
@@ -52,16 +51,24 @@ public class Review {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Product getProduct() {
         return product;
     }
 
-    public User getUser() {
-        return user;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public String getComment() {
@@ -88,30 +95,6 @@ public class Review {
         return user.getId();
     }
 
-    @Override
-    public String toString() {
-        return "Review{" +
-                "id=" + id +
-                ", product=" + product +
-                ", user=" + user +
-                ", comment='" + comment + '\'' +
-                ", rating=" + rating +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Review review = (Review) o;
-        return Objects.equals(product, review.product) && Objects.equals(user, review.user) && Objects.equals(comment, review.comment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(product, user, comment);
-    }
-
     public String getUserName() {
         return user.getUserName();
     }
@@ -128,5 +111,31 @@ public class Review {
         return product.getSeller().getUserName();
     }
 
+    @Override
+    public String toString() {
+        return "Review{" +
+                "id=" + id +
+                ", product=" + product +
+                ", user=" + user +
+                ", comment='" + comment + '\'' +
+                ", rating=" + rating +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Review review = (Review) o;
+        return Objects.equal(product, review.product) && Objects.equal(user, review.user) && Objects.equal(comment, review.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(product);
+        result = 31 * result + Objects.hashCode(user);
+        result = 31 * result + Objects.hashCode(comment);
+        return result;
+    }
 }
 

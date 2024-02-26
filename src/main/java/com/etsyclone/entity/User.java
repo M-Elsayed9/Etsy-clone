@@ -1,10 +1,9 @@
 package com.etsyclone.entity;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,7 +11,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -23,7 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_name", nullable = false, length = 50)
+    @Column(name = "user_name", nullable = false, unique = true, length = 50)
     private String userName;
 
     @Column(name = "email", nullable = false, unique = true, length = 50)
@@ -32,32 +30,50 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    private UserRoles role;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "role", nullable = false, length = 20)
+//    private UserRoles role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Address> addresses = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Order> orders = new HashSet<>();
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Product> sellerProducts = new HashSet<>();
+
+
     public User() {
     }
-    public User(String userName, String email, String passwordHash, UserRoles role) {
+    public User(String userName, String email, String passwordHash) {
         this.userName = userName;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.role = role;
     }
 
     public Long getId() {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getUserName() {
         return userName;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPasswordHash() {
@@ -68,33 +84,20 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public String getRole() {
-        return role.name();
-    }
-
-    public void setRole(UserRoles role) {
-        this.role = role;
-    }
-
     public Set<Address> getAddresses() {
         return addresses;
     }
 
-    public void addAddress(Address address) {
-        addresses.add(address);
-        address.setUser(this);
+    public void setAddresses(Set<Address> addresses) {
+        this.addresses = addresses;
     }
 
-    public void removeAddress(Address address) {
-        addresses.remove(address);;
+    public Set<Order> getOrders() {
+        return orders;
     }
 
-    public boolean isSeller() {
-        return role.equals("seller");
-    }
-
-    public boolean isBuyer() {
-        return role.equals("buyer");
+    public Set<Product> getProducts() {
+        return sellerProducts;
     }
 
     @Override
@@ -103,7 +106,6 @@ public class User {
         sb.append("id=").append(id);
         sb.append(", userName='").append(userName).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", role=").append(role);
         sb.append(", addresses=").append(addresses);
         sb.append('}');
         return sb.toString();
@@ -114,11 +116,13 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(userName, user.userName) && Objects.equals(email, user.email);
+        return Objects.equal(userName, user.userName) && Objects.equal(email, user.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, email);
+        int result = Objects.hashCode(userName);
+        result = 31 * result + Objects.hashCode(email);
+        return result;
     }
 }
