@@ -1,7 +1,10 @@
 package com.etsyclone.entity;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "role")
@@ -12,14 +15,21 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 50, unique = true, updatable = false)
+    @Column(name = "role", nullable = false, length = 50, updatable = false)
     private RoleName role;
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 
     public Role() {
     }
 
     public Role(RoleName role) {
         this.role = role;
+    }
+
+    public Role(String roleName) {
+        this.role = RoleName.valueOf(roleName);
     }
 
     public Long getId() {
@@ -53,17 +63,18 @@ public class Role {
     public boolean isAdmin() {
         return role.equals(RoleName.ADMIN);
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Role role = (Role) o;
-        return Objects.equals(this.role, role.role);
+        return Objects.equals(getRole(), role.role) && Objects.equals(getId(), role.getRole());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(role);
+        return Objects.hash(getRole(), getId());
     }
 
     @Override

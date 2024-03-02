@@ -1,7 +1,18 @@
 package com.etsyclone.entity;
 
 import com.google.common.base.Objects;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,11 +36,12 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
+            name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Address> addresses = new HashSet<>();
 
@@ -42,11 +54,10 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String email, String passwordHash, Set<Role> roles) {
+    public User(String userName, String email, String passwordHash) {
         this.userName = userName;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.roles = roles;
     }
 
     public Long getId() {
@@ -89,6 +100,16 @@ public class User {
         this.addresses = addresses;
     }
 
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setUser(this);
+    }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setUser(null);
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -97,9 +118,6 @@ public class User {
         this.roles = roles;
     }
 
-    public void addRole(Role role) {
-        roles.add(role);
-    }
     public Set<Order> getOrders() {
         return orders;
     }
@@ -115,7 +133,7 @@ public class User {
         sb.append(", userName='").append(userName).append('\'');
         sb.append(", email='").append(email).append('\'');
         sb.append(", passwordHash='").append(passwordHash).append('\'');
-        sb.append(", role=").append(roles.toString());
+        sb.append(", role=").append(roles);
         sb.append(", addresses=").append(addresses);
         sb.append(", orders=").append(orders);
         sb.append(", sellerProducts=").append(sellerProducts);
@@ -128,13 +146,13 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equal(userName, user.userName) && Objects.equal(email, user.email);
+        return Objects.equal(getUserName(), user.getUserName()) && Objects.equal(getEmail(), user.getEmail());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(userName);
-        result = 31 * result + Objects.hashCode(email);
+        int result = Objects.hashCode(getUserName());
+        result = 31 * result + Objects.hashCode(getEmail());
         return result;
     }
 }
