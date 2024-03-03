@@ -1,5 +1,5 @@
 package com.etsyclone.entity;
 
 public enum RoleName {
-    ADMIN, CUSTOMER, SELLER
+    ADMIN, CUSTOMER, SELLER, GUEST
 }

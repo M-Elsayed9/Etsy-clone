@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
 
 import jakarta.persistence.Column;
@@ -32,8 +33,9 @@ public class Address {
     @Column(name = "zip_code", nullable = false, length = 20)
     private String zipCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     public Address() {

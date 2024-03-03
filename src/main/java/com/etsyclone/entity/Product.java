@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,12 +39,13 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonBackReference
     private User seller;
 
     public Product() {

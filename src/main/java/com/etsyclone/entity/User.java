@@ -1,18 +1,8 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.common.base.Objects;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +24,7 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -42,14 +32,21 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Address> addresses = new HashSet<>();
-
     @OneToMany(mappedBy = "user")
-    private Set<Order> orders = new HashSet<>();
+    @JsonManagedReference
+    private Set<Address> addresses;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Product> sellerProducts = new HashSet<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<Order> orders;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<Product> sellerProducts;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Cart cart;
 
     public User() {
     }
@@ -64,7 +61,7 @@ public class User {
         return id;
     }
 
-    public void setId(Long id) {
+    private void setId(Long id) {
         this.id = id;
     }
 
@@ -122,21 +119,24 @@ public class User {
         return orders;
     }
 
-    public Set<Product> getProducts() {
+    public Set<Product> getSellerProducts() {
         return sellerProducts;
     }
 
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("id=").append(id);
         sb.append(", userName='").append(userName).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", passwordHash='").append(passwordHash).append('\'');
-        sb.append(", role=").append(roles);
-        sb.append(", addresses=").append(addresses);
-        sb.append(", orders=").append(orders);
-        sb.append(", sellerProducts=").append(sellerProducts);
+        sb.append(", roles=").append(roles);
         sb.append('}');
         return sb.toString();
     }
@@ -154,5 +154,13 @@ public class User {
         int result = Objects.hashCode(getUserName());
         result = 31 * result + Objects.hashCode(getEmail());
         return result;
+    }
+
+    public void setOrders(HashSet<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void setSellerProducts(HashSet<Product> products) {
+        this.sellerProducts = products;
     }
 }
