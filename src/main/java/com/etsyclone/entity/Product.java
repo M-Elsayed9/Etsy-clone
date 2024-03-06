@@ -2,6 +2,7 @@ package com.etsyclone.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,9 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "product")
@@ -39,47 +43,19 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     @JsonBackReference
     private User seller;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Review> reviews = new HashSet<>();
+
     public Product() {
-    }
-
-    public Product(String name, String description, BigDecimal price, String imageUrl, Category category, User seller, Integer stock) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.category = category;
-        this.seller = seller;
-    }
-
-    public Product(String name, String description, BigDecimal price, String imageUrl, User seller, Integer stock) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.seller = seller;
-    }
-
-    public Product(String name, String description, BigDecimal price, Category category, User seller,  Integer stock) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrl = imageUrl;
-    }
-
-    public Product(String name, String description, BigDecimal price, User seller, Integer stock) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.seller = seller;
     }
 
     public Long getId() {
@@ -158,6 +134,42 @@ public class Product {
         this.category = category;
     }
 
+    public Set<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public void addReview(Review review) {
+        reviews.add(review);
+        review.setProduct(this);
+    }
+
+    public void removeReview(Review review) {
+        reviews.remove(review);
+        review.setProduct(null);
+    }
+
+    public void clearReviews() {
+        reviews.clear();
+    }
+
+    public boolean isAvailable() {
+        if (stock > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAvailable(Integer quantity) {
+        if (stock >= quantity) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -182,6 +194,58 @@ public class Product {
         int result = Objects.hashCode(name);
         result = 31 * result + Objects.hashCode(seller);
         return result;
+    }
+
+    public static class Builder {
+        private final Product product;
+
+        public Builder() {
+            product = new Product();
+        }
+
+        public Builder withName(String name) {
+            product.name = name;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            product.description = description;
+            return this;
+        }
+
+        public Builder withPrice(BigDecimal price) {
+            product.price = price;
+            return this;
+        }
+
+        public Builder withImageUrl(String imageUrl) {
+            product.imageUrl = imageUrl;
+            return this;
+        }
+
+        public Builder withCategory(Category category) {
+            product.category = category;
+            return this;
+        }
+
+        public Builder withSeller(User seller) {
+            product.seller = seller;
+            return this;
+        }
+
+        public Builder withStock(Integer stock) {
+            product.stock = stock;
+            return this;
+        }
+
+        public Builder withReviews(Set<Review> reviews) {
+            product.reviews = reviews;
+            return this;
+        }
+
+        public Product build() {
+            return product;
+        }
     }
 }
 
