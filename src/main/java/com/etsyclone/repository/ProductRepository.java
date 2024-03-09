@@ -3,11 +3,13 @@ package com.etsyclone.repository;
 import com.etsyclone.entity.Category;
 import com.etsyclone.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Map;
+
 import java.util.Set;
 
+@Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findByName(String name);
 
@@ -17,4 +19,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Set<Product> findByPriceLessThanEqual(Double price);
 
+    Set<Product> findByPriceGreaterThanEqual(Double price);
 }
