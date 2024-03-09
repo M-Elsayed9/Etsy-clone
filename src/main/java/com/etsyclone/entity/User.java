@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -22,7 +23,12 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = {
+        @Index(name = "idx_user_name", columnList = "user_name", unique = true),
+        @Index(name = "idx_email", columnList = "email", unique = true),
+        @Index(name = "idx_stripe_customer_id", columnList = "stripe_customer_id")
+})
+
 public class User {
 
     @Id
@@ -61,6 +67,9 @@ public class User {
     @OneToOne(mappedBy = "customer", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private Cart cart;
+
+    @Column(name = "stripe_customer_id")
+    private String stripeCustomerId;
 
     public User() {
     }
@@ -191,6 +200,14 @@ public class User {
     public void removeProduct(Product product) {
         sellerProducts.remove(product);
         product.setSeller(null);
+    }
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
     }
 
     @Override

@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -20,7 +21,9 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "customer_order")
+@Table(name = "customer_order", indexes = {
+        @Index(name = "idx_user_id", columnList = "user_id"),
+})
 public class Order {
 
     @Id
@@ -42,6 +45,12 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<OrderItem> orderItems = new HashSet<>();
+
+    @Column(name = "stripe_charge_id")
+    private String stripeChargeId;
+
+    @Column(name = "payment_status")
+    private String orderStatus;
 
     public Order() {
     }
@@ -114,6 +123,14 @@ public class Order {
                 .filter(item -> item.getProduct().getId().equals(orderItem.getProduct().getId()))
                 .findFirst()
                 .ifPresent(item -> item.setQuantity(orderItem.getQuantity()));
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     @Override

@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -19,7 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "cart")
+@Table(name = "cart", indexes = {
+        @Index(name = "idx_customer_id", columnList = "customer_id"),
+})
 public class Cart {
 
     @Id

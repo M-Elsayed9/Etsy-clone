@@ -7,12 +7,17 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 
-@Entity(name = "order_item")
+@Entity
+@Table(name = "order_item", indexes = {
+        @Index(name = "idx_order_id", columnList = "order_id")
+})
 public class OrderItem {
 
     @Id

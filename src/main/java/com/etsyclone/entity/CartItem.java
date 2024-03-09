@@ -10,9 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 
 @Entity
-@Table(name = "cart_item")
+@Table(name = "cart_item", indexes = {
+        @Index(name = "idx_cart_id", columnList = "cart_id")
+})
 public class CartItem {
 
     @Id
