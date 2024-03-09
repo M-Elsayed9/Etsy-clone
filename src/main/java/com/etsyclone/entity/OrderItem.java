@@ -12,18 +12,18 @@ import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
 
-@Entity
+@Entity(name = "order_item")
 public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -115,11 +115,6 @@ public class OrderItem {
         return product.getSeller().getUserName();
     }
 
-    public String getCategoryName() {
-        return product.getCategory().getName();
-    }
-
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("OrderItem{");
@@ -135,13 +130,13 @@ public class OrderItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderItem orderItem = (OrderItem) o;
-        return Objects.equal(order, orderItem.order) && Objects.equal(product, orderItem.product);
+        return Objects.equal(getOrder(), orderItem.getOrder()) && Objects.equal(getProduct(), orderItem.getProduct());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(order);
-        result = 31 * result + Objects.hashCode(product);
+        int result = Objects.hashCode(getOrder());
+        result = 31 * result + Objects.hashCode(getProduct());
         return result;
     }
 }

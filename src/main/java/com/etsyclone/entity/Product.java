@@ -10,7 +10,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -43,11 +45,15 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "seller_id", nullable = false)
     @JsonBackReference
     private User seller;
@@ -79,14 +85,23 @@ public class Product {
     }
 
     public void setStock(Integer stock) {
+        if (stock < 0) {
+            throw new IllegalArgumentException("Stock must be greater than or equal to 0");
+        }
         this.stock = stock;
     }
 
     public void addStock(Integer stock) {
+        if (stock < 0) {
+            throw new IllegalArgumentException("Stock must be greater than or equal to 0");
+        }
         this.stock += stock;
     }
 
     public void removeStock(Integer stock) {
+        if (stock > this.stock) {
+            throw new IllegalArgumentException("Stock must be less than or equal to current stock");
+        }
         this.stock -= stock;
     }
 
@@ -103,6 +118,9 @@ public class Product {
     }
 
     public void setPrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price must be greater than or equal to 0");
+        }
         this.price = price;
     }
 
@@ -124,14 +142,6 @@ public class Product {
 
     public User getSeller() {
         return seller;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public Set<Review> getReviews() {
@@ -170,15 +180,36 @@ public class Product {
         return false;
     }
 
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void addCategory(Category category) {
+        categories.add(category);
+        category.getProducts().add(this);
+    }
+
+    public void removeCategory(Category category) {
+        categories.remove(category);
+        category.getProducts().remove(this);
+    }
+
     @Override
     public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", price=" + price +
-                ", sellerId=" + seller.getId() +
-                '}';
+        final StringBuilder sb = new StringBuilder("Product{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", price=").append(price);
+        sb.append(", stock=").append(stock);
+        sb.append(", imageUrl='").append(imageUrl).append('\'');
+        sb.append(", seller=").append(seller);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -186,13 +217,13 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equal(name, product.name) && Objects.equal(seller, product.seller);
+        return Objects.equal(getName(), product.getName()) && Objects.equal(getSeller(), product.getSeller());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(name);
-        result = 31 * result + Objects.hashCode(seller);
+        int result = Objects.hashCode(getName());
+        result = 31 * result + Objects.hashCode(getSeller());
         return result;
     }
 
@@ -223,18 +254,13 @@ public class Product {
             return this;
         }
 
-        public Builder withCategory(Category category) {
-            product.category = category;
-            return this;
-        }
-
         public Builder withSeller(User seller) {
             product.seller = seller;
             return this;
         }
 
         public Builder withStock(Integer stock) {
-            product.stock = stock;
+            product.setStock(stock);
             return this;
         }
 

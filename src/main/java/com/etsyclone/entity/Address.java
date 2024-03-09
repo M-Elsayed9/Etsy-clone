@@ -3,9 +3,9 @@ package com.etsyclone.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,20 +33,20 @@ public class Address {
     @Column(name = "zip_code", nullable = false, length = 20)
     private String zipCode;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "customer_id", nullable = false, updatable = false)
     @JsonBackReference
-    private User user;
+    private User customer;
 
     public Address() {
     }
 
-    public Address(String street, String city, String state, String zipCode, User user) {
+    public Address(String street, String city, String state, String zipCode, User customer) {
         this.street = street;
         this.city = city;
         this.state = state;
         this.zipCode = zipCode;
-        this.user = user;
+        this.customer = customer;
     }
 
     public Long getId() {
@@ -89,23 +89,25 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-    public User getUser() {
-        return user;
+    public User getCustomer() {
+        return customer;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCustomer(User customer) {
+        this.customer = customer;
     }
 
+    @Override
     public String toString() {
-        return "Address{" +
-                "id=" + id +
-                ", street='" + street + '\'' +
-                ", city='" + city + '\'' +
-                ", state='" + state + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", userId=" + user.getId() +
-                '}';
+        final StringBuilder sb = new StringBuilder("Address{");
+        sb.append("id=").append(id);
+        sb.append(", street='").append(street).append('\'');
+        sb.append(", city='").append(city).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", zipCode='").append(zipCode).append('\'');
+        sb.append(", customer=").append(customer);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -113,16 +115,21 @@ public class Address {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equal(street, address.getStreet()) && com.google.common.base.Objects.equal(city, address.getCity()) && com.google.common.base.Objects.equal(state, address.getState()) && com.google.common.base.Objects.equal(zipCode, address.getZipCode()) && com.google.common.base.Objects.equal(user, address.user);
+        return Objects.equal(getStreet(),
+                address.getStreet()) && Objects.equal(getCity(),
+                address.getCity()) && Objects.equal(getState(),
+                address.getState()) && Objects.equal(getZipCode(),
+                address.getZipCode()) && Objects.equal(getCustomer(),
+                address.getCustomer());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(street);
-        result = 31 * result + Objects.hashCode(city);
-        result = 31 * result + Objects.hashCode(state);
-        result = 31 * result + Objects.hashCode(zipCode);
-        result = 31 * result + Objects.hashCode(user);
+        int result = Objects.hashCode(getStreet());
+        result = 31 * result + Objects.hashCode(getCity());
+        result = 31 * result + Objects.hashCode(getState());
+        result = 31 * result + Objects.hashCode(getZipCode());
+        result = 31 * result + Objects.hashCode(getCustomer());
         return result;
     }
 }

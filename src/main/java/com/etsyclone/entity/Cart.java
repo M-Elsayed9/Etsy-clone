@@ -29,12 +29,12 @@ public class Cart {
     @Column(name = "total_price", precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
-    @OneToOne
+    @OneToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonBackReference
     private User customer;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<CartItem> items;
 
     public Cart() {
@@ -71,6 +71,7 @@ public class Cart {
     }
 
     public void addItem(CartItem item) {
+        item.setCart(this);
         items.add(item);
     }
 
@@ -89,6 +90,9 @@ public class Cart {
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
+        if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total price cannot be negative");
+        }
         this.totalPrice = totalPrice;
     }
 
@@ -106,6 +110,11 @@ public class Cart {
     public void removeItem(Product product) {
         items.removeIf(cartItem -> cartItem.getProduct().getId().equals(product.getId()));
     }
+
+    public CartItem[] getCartItems() {
+        return items.toArray(new CartItem[0]);
+    }
+
 
     @Override
     public String toString() {
@@ -126,15 +135,12 @@ public class Cart {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cart cart = (Cart) o;
-        return Objects.equal(customer, cart.customer);
+        return Objects.equal(getCustomer(), cart.getCustomer());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(customer);
+        return Objects.hashCode(getCustomer());
     }
 
-    public CartItem[] getCartItems() {
-        return items.toArray(new CartItem[0]);
-    }
 }

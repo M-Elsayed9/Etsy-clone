@@ -1,20 +1,15 @@
 package com.etsyclone.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import com.google.common.base.Objects;
 
 @Entity
 @Table(name = "role")
@@ -27,9 +22,6 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 50, updatable = false)
     private RoleName role;
-
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users = new HashSet<>();
 
     public Role() {
     }
@@ -58,35 +50,17 @@ public class Role {
         this.role = role;
     }
 
-    public boolean isGuest() {
-        return role.equals(RoleName.GUEST);
-    }
-
-    @JsonIgnore
-    public boolean isCustomer() {
-        return role.equals(RoleName.CUSTOMER);
-    }
-
-    @JsonIgnore
-    public boolean isSeller() {
-        return role.equals(RoleName.SELLER);
-    }
-
-    public boolean isAdmin() {
-        return role.equals(RoleName.ADMIN);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Role role = (Role) o;
-        return Objects.equals(getRole(), role.getRole());
+        Role role1 = (Role) o;
+        return Objects.equal(getId(), role1.getId()) && getRole() == role1.getRole();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getRole());
+        return Objects.hashCode(getId(), getRole());
     }
 
     @Override

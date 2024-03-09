@@ -1,28 +1,32 @@
 package com.etsyclone.entity;
 
 import com.google.common.base.Objects;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "review")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private User customer;
 
     @Lob
     @Column(name = "comment", nullable = false, columnDefinition = "TEXT")
@@ -34,17 +38,18 @@ public class Review {
     public Review() {
     }
 
-    public Review(Product product, User user, String comment, Short rating) {
+    public Review(Product product, User customer, String comment, Short rating) {
         this.product = product;
-        this.user = user;
+        this.customer = customer;
         this.comment = comment;
         this.rating = rating;
     }
 
-    public Review(Product product, User user, String comment) {
+    public Review(Product product, User customer, String comment) {
         this.product = product;
-        this.user = user;
+        this.customer = customer;
         this.comment = comment;
+        this.rating = 0;
     }
 
     public Long getId() {
@@ -63,12 +68,12 @@ public class Review {
         this.product = product;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCustomer(User customer) {
+        this.customer = customer;
     }
 
-    public User getUser() {
-        return user;
+    public User getCustomer() {
+        return customer;
     }
 
     public String getComment() {
@@ -91,20 +96,16 @@ public class Review {
         return product.getId();
     }
 
-    public Long getUserId() {
-        return user.getId();
+    public Long getCustomerId() {
+        return customer.getId();
     }
 
-    public String getUserName() {
-        return user.getUserName();
+    public String getCustomerUserName() {
+        return customer.getUserName();
     }
 
     public String getProductName() {
         return product.getName();
-    }
-
-    public String getProductImageUrl() {
-        return product.getImageUrl();
     }
 
     public String getProductSellerName() {
@@ -113,13 +114,14 @@ public class Review {
 
     @Override
     public String toString() {
-        return "Review{" +
-                "id=" + id +
-                ", product=" + product +
-                ", user=" + user +
-                ", comment='" + comment + '\'' +
-                ", rating=" + rating +
-                '}';
+        final StringBuilder sb = new StringBuilder("Review{");
+        sb.append("id=").append(id);
+        sb.append(", product=").append(product);
+        sb.append(", customer=").append(customer);
+        sb.append(", comment='").append(comment).append('\'');
+        sb.append(", rating=").append(rating);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -127,14 +129,14 @@ public class Review {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review = (Review) o;
-        return Objects.equal(product, review.product) && Objects.equal(user, review.user) && Objects.equal(comment, review.comment);
+        return Objects.equal(getProduct(), review.getProduct()) && Objects.equal(getCustomer(), review.getCustomer()) && Objects.equal(getComment(), review.getComment());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(product);
-        result = 31 * result + Objects.hashCode(user);
-        result = 31 * result + Objects.hashCode(comment);
+        int result = Objects.hashCode(getProduct());
+        result = 31 * result + Objects.hashCode(getCustomer());
+        result = 31 * result + Objects.hashCode(getComment());
         return result;
     }
 }

@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,26 +28,26 @@ public class Order {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
-    private User user;
+    private User customer;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<OrderItem> orderItems = new HashSet<>();
 
     public Order() {
     }
 
     public Order(User user, Address address, BigDecimal totalPrice) {
-        this.user = user;
+        this.customer = user;
         this.address = address;
         this.totalPrice = totalPrice;
     }
@@ -59,12 +60,12 @@ public class Order {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getCustomer() {
+        return customer;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCustomer(User user) {
+        this.customer = user;
     }
 
     public Address getAddress() {
@@ -80,6 +81,9 @@ public class Order {
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
+        if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total price cannot be negative");
+        }
         this.totalPrice = totalPrice;
     }
 
@@ -116,7 +120,7 @@ public class Order {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Order{");
         sb.append("id=").append(id);
-        sb.append(", user=").append(user);
+        sb.append(", user=").append(customer);
         sb.append(", address=").append(address);
         sb.append(", totalPrice=").append(totalPrice);
         sb.append(", orderItems=").append(orderItems);
@@ -132,15 +136,15 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equal(user, order.user) && Objects.equal(address, order.address) && Objects.equal(totalPrice, order.totalPrice) && Objects.equal(orderItems, order.orderItems);
+        return Objects.equal(getCustomer(), order.getCustomer()) && Objects.equal(getAddress(), order.getAddress()) && Objects.equal(getTotalPrice(), order.getTotalPrice()) && Objects.equal(getOrderItems(), order.getOrderItems());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(user);
-        result = 31 * result + Objects.hashCode(address);
-        result = 31 * result + Objects.hashCode(totalPrice);
-        result = 31 * result + Objects.hashCode(orderItems);
+        int result = Objects.hashCode(getCustomer());
+        result = 31 * result + Objects.hashCode(getAddress());
+        result = 31 * result + Objects.hashCode(getTotalPrice());
+        result = 31 * result + Objects.hashCode(getOrderItems());
         return result;
     }
 }

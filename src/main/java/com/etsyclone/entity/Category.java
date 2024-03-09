@@ -6,9 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -22,8 +23,8 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "category")
-    private Set<Product> products;
+    @ManyToMany(mappedBy = "categories")
+    private Set<Product> products = new HashSet<>();
 
     public Category() {
     }
@@ -56,6 +57,16 @@ public class Category {
         this.products = products;
     }
 
+    public void addProduct(Product product) {
+        products.add(product);
+        product.getCategories().add(this);
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+        product.getCategories().remove(this);
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Category{");
@@ -72,11 +83,11 @@ public class Category {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return Objects.equal(name, category.name);
+        return Objects.equal(getName(), category.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return Objects.hashCode(getName());
     }
 }

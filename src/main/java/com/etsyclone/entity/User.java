@@ -1,10 +1,24 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.common.base.Objects;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,30 +35,30 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 100)
-    private String passwordHash;
+    @Column(name = "password", nullable = false, length = 100)
+    private String password;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "users_roles",
+            name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonManagedReference
     private Set<Address> addresses;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonManagedReference
     private Set<Order> orders;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "seller", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Set<Product> sellerProducts;
+    private List<Product> sellerProducts;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "customer", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private Cart cart;
 
@@ -54,7 +68,7 @@ public class User {
     public User(String userName, String email, String passwordHash) {
         this.userName = userName;
         this.email = email;
-        this.passwordHash = passwordHash;
+        this.password = passwordHash;
     }
 
     public Long getId() {
@@ -82,11 +96,11 @@ public class User {
     }
 
     public String getPasswordHash() {
-        return passwordHash;
+        return password;
     }
 
     public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+        this.password = passwordHash;
     }
 
     public Set<Address> getAddresses() {
@@ -99,12 +113,12 @@ public class User {
 
     public void addAddress(Address address) {
         addresses.add(address);
-        address.setUser(this);
+        address.setCustomer(this);
     }
 
     public void removeAddress(Address address) {
         addresses.remove(address);
-        address.setUser(null);
+        address.setCustomer(null);
     }
 
     public Set<Role> getRoles() {
@@ -119,7 +133,7 @@ public class User {
         return orders;
     }
 
-    public Set<Product> getSellerProducts() {
+    public List<Product> getSellerProducts() {
         return sellerProducts;
     }
 
@@ -130,6 +144,55 @@ public class User {
     public void setCart(Cart cart) {
         this.cart = cart;
     }
+
+    public void setOrders(HashSet<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void setSellerProducts(List<Product> products) {
+        this.sellerProducts = products;
+    }
+
+    @JsonIgnore
+    public boolean isGuest() {
+        return roles.contains(RoleName.GUEST);
+    }
+
+    @JsonIgnore
+    public boolean isCustomer() {
+        return roles.contains(RoleName.CUSTOMER);
+    }
+
+    @JsonIgnore
+    public boolean isSeller() {
+        return roles.contains(RoleName.SELLER);
+    }
+
+    @JsonIgnore
+    public boolean isAdmin() {
+        return roles.contains(RoleName.ADMIN);
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setCustomer(this);
+    }
+
+    public void removeOrder(Order order) {
+        orders.remove(order);
+        order.setCustomer(null);
+    }
+
+    public void addProduct(Product product) {
+        sellerProducts.add(product);
+        product.setSeller(this);
+    }
+
+    public void removeProduct(Product product) {
+        sellerProducts.remove(product);
+        product.setSeller(null);
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
@@ -154,13 +217,5 @@ public class User {
         int result = Objects.hashCode(getUserName());
         result = 31 * result + Objects.hashCode(getEmail());
         return result;
-    }
-
-    public void setOrders(HashSet<Order> orders) {
-        this.orders = orders;
-    }
-
-    public void setSellerProducts(HashSet<Product> products) {
-        this.sellerProducts = products;
     }
 }

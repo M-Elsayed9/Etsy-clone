@@ -1,9 +1,9 @@
 package com.etsyclone.entity;
 
 import com.google.common.base.Objects;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,15 +19,15 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
     private Short quantity;
 
     public CartItem() {
@@ -95,13 +95,13 @@ public class CartItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CartItem cartItem = (CartItem) o;
-        return Objects.equal(cart, cartItem.cart) && Objects.equal(product, cartItem.product);
+        return Objects.equal(getCart(), cartItem.getCart()) && Objects.equal(getProduct(), cartItem.getProduct());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(cart);
-        result = 31 * result + Objects.hashCode(product);
+        int result = Objects.hashCode(getCart());
+        result = 31 * result + Objects.hashCode(getProduct());
         return result;
     }
 }
