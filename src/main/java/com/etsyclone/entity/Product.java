@@ -2,7 +2,21 @@ package com.etsyclone.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -18,20 +32,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(100)", updatable = false)
     private String name;
 
     @Lob
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 1000)
     private String description;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "price", nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal price;
 
-    @Column(name = "stock", nullable = false)
+    @Column(name = "stock", nullable = false, columnDefinition = "SMALLINT")
     private Integer stock;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "VARCHAR(255)")
     private String imageUrl;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
@@ -43,7 +57,7 @@ public class Product {
     private Set<Category> categories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "seller_id", nullable = false)
+    @JoinColumn(name = "seller_id", nullable = false, updatable = false)
     @JsonBackReference
     private User seller;
 
@@ -192,27 +206,28 @@ public class Product {
         final StringBuilder sb = new StringBuilder("Product{");
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
+        sb.append(", description='").append("[description hidden for brevity]").append('\''); // Optionally hide lengthy descriptions
         sb.append(", price=").append(price);
         sb.append(", stock=").append(stock);
         sb.append(", imageUrl='").append(imageUrl).append('\'');
-        sb.append(", seller=").append(seller);
+        sb.append(", sellerId=").append(seller != null ? seller.getId() : "null");
         sb.append('}');
         return sb.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equal(getName(), product.getName()) && Objects.equal(getSeller(), product.getSeller());
+        return Objects.equal(getName(), product.getName()) && Objects.equal(getSeller().getId(), product.getSeller().getId());
     }
 
     @Override
     public int hashCode() {
         int result = Objects.hashCode(getName());
-        result = 31 * result + Objects.hashCode(getSeller());
+        result = 31 * result + Objects.hashCode(getSeller().getId());
         return result;
     }
 

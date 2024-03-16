@@ -32,24 +32,24 @@ public class Order {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @JsonBackReference
     private User customer;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "address_id", nullable = false)
+    @JoinColumn(name = "address_id", nullable = false, updatable = false)
     private Address address;
 
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)", updatable = false)
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<OrderItem> orderItems = new HashSet<>();
 
-    @Column(name = "stripe_charge_id")
-    private String stripeChargeId;
+//    @Column(name = "stripe_charge_id", length = 50, columnDefinition = "VARCHAR(50)")
+//    private String stripeChargeId;
 
-    @Column(name = "payment_status")
+    @Column(name = "payment_status", length = 20, columnDefinition = "VARCHAR(20)")
     private String orderStatus;
 
     public Order() {
@@ -137,29 +137,31 @@ public class Order {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Order{");
         sb.append("id=").append(id);
-        sb.append(", user=").append(customer);
-        sb.append(", address=").append(address);
+        sb.append(", customerId=").append(customer != null ? customer.getId() : "null");
+        sb.append(", addressId=").append(address != null ? address.getId() : "null");
         sb.append(", totalPrice=").append(totalPrice);
-        sb.append(", orderItems=").append(orderItems);
-        for (OrderItem orderItem : orderItems) {
-            sb.append(orderItem);
-        }
+        sb.append(", orderItemsCount=").append(orderItems.size());
+        sb.append(", orderStatus='").append(orderStatus).append('\'');
         sb.append('}');
         return sb.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equal(getCustomer(), order.getCustomer()) && Objects.equal(getAddress(), order.getAddress()) && Objects.equal(getTotalPrice(), order.getTotalPrice()) && Objects.equal(getOrderItems(), order.getOrderItems());
+        return Objects.equal(getCustomer().getId(), order.getCustomer().getId())
+                && Objects.equal(getAddress().getId(), order.getAddress().getId())
+                && Objects.equal(getTotalPrice(), order.getTotalPrice())
+                && Objects.equal(getOrderItems(), order.getOrderItems());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(getCustomer());
-        result = 31 * result + Objects.hashCode(getAddress());
+        int result = Objects.hashCode(getCustomer().getId());
+        result = 31 * result + Objects.hashCode(getAddress().getId());
         result = 31 * result + Objects.hashCode(getTotalPrice());
         result = 31 * result + Objects.hashCode(getOrderItems());
         return result;

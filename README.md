@@ -1,7 +1,5 @@
-# Etsy-clone-CISC-4900
-# CISC 4900 graduation project
-
 # Etsy Clone E-commerce Web Application
+# CISC 4900 graduation project
 
 ## Table of Contents
 - [Project Description](#project-description)
@@ -18,5 +16,6 @@
 
 ## Development Setup
 
-### Prerequisites
+## Installation Instructions
+
 

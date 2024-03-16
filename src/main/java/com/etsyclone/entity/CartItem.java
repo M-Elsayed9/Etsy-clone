@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "cart_item", indexes = {
         @Index(name = "idx_cart_id", columnList = "cart_id")
@@ -23,11 +26,12 @@ public class CartItem {
     private Long id;
 
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "cart_id", nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false, updatable = false)
+    @JsonBackReference
     private Cart cart;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false, updatable = false)
     private Product product;
 
     @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
@@ -58,6 +62,7 @@ public class CartItem {
         this.cart = cart;
     }
 
+
     public Product getProduct() {
         return product;
     }
@@ -71,6 +76,9 @@ public class CartItem {
     }
 
     public void setQuantity(Short quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
         this.quantity = quantity;
     }
 
@@ -86,8 +94,8 @@ public class CartItem {
     public String toString() {
         final StringBuilder sb = new StringBuilder("CartItem{");
         sb.append("id=").append(id);
-        sb.append(", cart=").append(cart);
-        sb.append(", product=").append(product);
+        sb.append(", cartId=").append(cart != null ? cart.getId() : "null");
+        sb.append(", productId=").append(product != null ? product.getId() : "null");
         sb.append(", quantity=").append(quantity);
         sb.append('}');
         return sb.toString();
@@ -98,13 +106,19 @@ public class CartItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CartItem cartItem = (CartItem) o;
-        return Objects.equal(getCart(), cartItem.getCart()) && Objects.equal(getProduct(), cartItem.getProduct());
+        return Objects.equal(getCart().getId(), cartItem.getCart().getId())
+                && Objects.equal(getProduct().getId(), cartItem.getProduct().getId());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(getCart());
-        result = 31 * result + Objects.hashCode(getProduct());
+        int result = Objects.hashCode(getCart().getId());
+        result = 31 * result + Objects.hashCode(getProduct().getId());
         return result;
+    }
+
+
+    public BigDecimal getTotalPrice() {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }

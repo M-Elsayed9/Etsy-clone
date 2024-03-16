@@ -4,7 +4,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.etsyclone.entity.Role;
-import com.etsyclone.entity.RoleName;
 import com.etsyclone.repository.RoleRepository;
 import com.etsyclone.repository.CategoryRepository;
 
@@ -15,7 +14,7 @@ public class DataLoader {
     CommandLineRunner initDatabase(RoleRepository roleRepository, CategoryRepository categoryRepository) {
         return args -> {
             if (roleRepository.count() == 0) {
-                // 'ADMIN', 'CUSTOMER', 'SELLER', 'GUEST
+                // ROLES = { 'ADMIN', 'CUSTOMER', 'SELLER', 'GUEST }
                 roleRepository.save(new Role(RoleName.GUEST));
                 roleRepository.save(new Role(RoleName.ADMIN));
                 roleRepository.save(new Role(RoleName.CUSTOMER));
@@ -23,6 +22,10 @@ public class DataLoader {
             }
 
             if(categoryRepository.count() == 0) {
+                // CATEGORIES = { 'Handmade Goods', 'Vintage Items',
+                // 'Craft Supplies', 'Art & Collectibles', 'Jewelry',
+                // 'Clothing', 'Home & Living', 'Wedding & Party',
+                // 'Toys & Entertainment', 'Others' }
                 categoryRepository.save(new Category("Handmade Goods"));
                 categoryRepository.save(new Category("Vintage Items"));
                 categoryRepository.save(new Category("Craft Supplies"));
@@ -31,6 +34,7 @@ public class DataLoader {
                 categoryRepository.save(new Category("Clothing"));
                 categoryRepository.save(new Category("Home & Living"));
                 categoryRepository.save(new Category("Wedding & Party"));
+                categoryRepository.save(new Category("Toys & Entertainment"));
                 categoryRepository.save(new Category("Others"));
             }
         };

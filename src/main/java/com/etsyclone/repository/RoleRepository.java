@@ -1,6 +1,6 @@
 package com.etsyclone.repository;
 import com.etsyclone.entity.Role;
-import com.etsyclone.entity.RoleName;
+import com.etsyclone.config.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

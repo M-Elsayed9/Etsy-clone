@@ -24,16 +24,16 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "street", nullable = false, length = 100)
+    @Column(name = "street", nullable = false, columnDefinition = "VARCHAR(100)", updatable = false)
     private String street;
 
-    @Column(name = "city", nullable = false, length = 20)
+    @Column(name = "city", nullable = false, columnDefinition = "VARCHAR(50)", updatable = false)
     private String city;
 
-    @Column(name = "state", nullable = false, length = 20)
+    @Column(name = "state", nullable = false, columnDefinition = "VARCHAR(50)", updatable = false)
     private String state;
 
-    @Column(name = "zip_code", nullable = false, length = 20)
+    @Column(name = "zip_code", nullable = false, columnDefinition = "VARCHAR(10)", updatable = false)
     private String zipCode;
 
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -108,10 +108,11 @@ public class Address {
         sb.append(", city='").append(city).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", zipCode='").append(zipCode).append('\'');
-        sb.append(", customer=").append(customer);
+        sb.append(", customerId=").append(customer != null ? customer.getId() : "null");
         sb.append('}');
         return sb.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -122,8 +123,8 @@ public class Address {
                 address.getStreet()) && Objects.equal(getCity(),
                 address.getCity()) && Objects.equal(getState(),
                 address.getState()) && Objects.equal(getZipCode(),
-                address.getZipCode()) && Objects.equal(getCustomer(),
-                address.getCustomer());
+                address.getZipCode()) && Objects.equal(getCustomer().getId(),
+                address.getCustomer().getId());
     }
 
     @Override
@@ -132,7 +133,7 @@ public class Address {
         result = 31 * result + Objects.hashCode(getCity());
         result = 31 * result + Objects.hashCode(getState());
         result = 31 * result + Objects.hashCode(getZipCode());
-        result = 31 * result + Objects.hashCode(getCustomer());
+        result = 31 * result + Objects.hashCode(getCustomer().getId());
         return result;
     }
 }

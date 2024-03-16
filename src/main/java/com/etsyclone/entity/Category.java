@@ -20,7 +20,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @Column(name = "name", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
     private String name;
 
     @ManyToMany(mappedBy = "categories")
@@ -70,13 +70,13 @@ public class Category {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Category{");
-        sb.append("products=").append(products);
-        for (Product product : products) {
-            sb.append(product.getName());
-        }
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", productsCount=").append(products.size());
         sb.append('}');
         return sb.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {

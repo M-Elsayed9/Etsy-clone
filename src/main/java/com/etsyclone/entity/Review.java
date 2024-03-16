@@ -24,19 +24,19 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false, updatable = false)
     private Product product;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id")
     private User customer;
 
     @Lob
-    @Column(name = "comment", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "comment", nullable = false, columnDefinition = "TEXT", length = 1000, updatable = false)
     private String comment;
 
-    @Column(name = "rating")
+    @Column(name = "rating", columnDefinition = "SMALLINT")
     private Short rating;
 
     public Review() {
@@ -44,9 +44,24 @@ public class Review {
 
     public Review(Product product, User customer, String comment, Short rating) {
         this.product = product;
-        this.customer = customer;
+        if(customer != null) {
+            this.customer = customer;
+        }
+        this.comment = comment;
+        if (rating != null) {
+            this.rating = rating;
+        }
+    }
+
+    public Review(Product product, String comment, Short rating) {
+        this.product = product;
         this.comment = comment;
         this.rating = rating;
+    }
+
+    public Review(Product product, String comment) {
+        this.product = product;
+        this.comment = comment;
     }
 
     public Review(Product product, User customer, String comment) {
@@ -54,6 +69,10 @@ public class Review {
         this.customer = customer;
         this.comment = comment;
         this.rating = 0;
+    }
+
+    public Review builder() {
+        return new Review(product, customer, comment, rating);
     }
 
     public Long getId() {
@@ -120,26 +139,29 @@ public class Review {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Review{");
         sb.append("id=").append(id);
-        sb.append(", product=").append(product);
-        sb.append(", customer=").append(customer);
+        sb.append(", productId=").append(product != null ? product.getId() : "null");
+        sb.append(", customerId=").append(customer != null ? customer.getId() : "null");
         sb.append(", comment='").append(comment).append('\'');
         sb.append(", rating=").append(rating);
         sb.append('}');
         return sb.toString();
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review = (Review) o;
-        return Objects.equal(getProduct(), review.getProduct()) && Objects.equal(getCustomer(), review.getCustomer()) && Objects.equal(getComment(), review.getComment());
+        return Objects.equal(getProduct().getId(), review.getProduct().getId())
+                && Objects.equal(getCustomer().getId(), review.getCustomer().getId())
+                && Objects.equal(getComment(), review.getComment());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(getProduct());
-        result = 31 * result + Objects.hashCode(getCustomer());
+        int result = Objects.hashCode(getProduct().getId());
+        result = 31 * result + Objects.hashCode(getCustomer().getId());
         result = 31 * result + Objects.hashCode(getComment());
         return result;
     }

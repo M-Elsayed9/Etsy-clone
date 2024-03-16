@@ -1,6 +1,7 @@
 package com.etsyclone.service;
 
 import com.etsyclone.entity.Role;
+import com.etsyclone.config.RoleName;
 import com.etsyclone.repository.RoleRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Optional<Role> getRole(Long id) {
         return roleRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Role> getRoleByName(RoleName role) {
+        return roleRepository.findByRole(role);
     }
 
     @Transactional

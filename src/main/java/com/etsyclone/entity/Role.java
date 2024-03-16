@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.etsyclone.config.RoleName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +21,7 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 50, updatable = false)
+    @Column(name = "role", nullable = false, unique = true, columnDefinition = "VARCHAR(20)")
     private RoleName role;
 
     public Role() {

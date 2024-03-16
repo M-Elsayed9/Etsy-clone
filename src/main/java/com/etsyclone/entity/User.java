@@ -1,5 +1,6 @@
 package com.etsyclone.entity;
 
+import com.etsyclone.config.RoleName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.common.base.Objects;
@@ -24,24 +25,22 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user", indexes = {
-        @Index(name = "idx_user_name", columnList = "user_name", unique = true),
-        @Index(name = "idx_email", columnList = "email", unique = true),
-        @Index(name = "idx_stripe_customer_id", columnList = "stripe_customer_id")
+        @Index(name = "idx_user_name", columnList = "user_name"),
+        @Index(name = "idx_email", columnList = "email")
 })
-
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_name", nullable = false, unique = true, length = 50)
+    @Column(name = "user_name", nullable = false, unique = true, columnDefinition = "VARCHAR(50)", updatable = false)
     private String userName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 50)
+    @Column(name = "email", nullable = false, unique = true, columnDefinition = "VARCHAR(50)", updatable = false)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 100)
+    @Column(name = "password", columnDefinition = "VARCHAR(100)", nullable = false)
     private String password;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
@@ -60,7 +59,7 @@ public class User {
     @JsonManagedReference
     private Set<Order> orders;
 
-    @OneToMany(mappedBy = "seller", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonManagedReference
     private List<Product> sellerProducts;
 
@@ -68,7 +67,7 @@ public class User {
     @JsonManagedReference
     private Cart cart;
 
-    @Column(name = "stripe_customer_id")
+    @Column(name = "stripe_customer_id", columnDefinition = "VARCHAR(50)")
     private String stripeCustomerId;
 
     public User() {
@@ -104,11 +103,11 @@ public class User {
         this.email = email;
     }
 
-    public String getPasswordHash() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
+    public void setPassword(String passwordHash) {
         this.password = passwordHash;
     }
 

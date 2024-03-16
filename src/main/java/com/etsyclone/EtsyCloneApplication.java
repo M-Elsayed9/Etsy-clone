@@ -9,5 +9,4 @@ public class EtsyCloneApplication {
     public static void main(String[] args) {
         SpringApplication.run(EtsyCloneApplication.class, args);
     }
-
 }
