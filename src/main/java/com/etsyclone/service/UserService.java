@@ -83,11 +83,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Role> getUserRoles(User user) {
-        return user.getRoles();
-    }
-
-    @Transactional(readOnly = true)
     public Set<Order> getUserOrders(Long id) {
         User user = getUser(id);
         return user.getOrders();    }

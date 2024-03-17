@@ -9,11 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 
 import com.google.common.base.Objects;
 
 @Entity
-@Table(name = "role")
+@Table(name = "role", indexes = {
+        @Index(name = "idx_role", columnList = "role")
+})
 public class Role {
 
     @Id
@@ -67,8 +70,7 @@ public class Role {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Role{");
-        sb.append("id=").append(id);
-        sb.append(", role=").append(role);
+        sb.append(", role=").append(role.name());
         sb.append('}');
         return sb.toString();
     }

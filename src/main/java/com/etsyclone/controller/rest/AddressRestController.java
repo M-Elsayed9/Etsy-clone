@@ -19,7 +19,7 @@ public class AddressRestController {
     }
 
     @PostMapping
-    public Address createAddress(@RequestBody Address address) {
+    public Address addAddress(@RequestBody Address address) {
         return addressService.saveAddress(address);
     }
     @GetMapping

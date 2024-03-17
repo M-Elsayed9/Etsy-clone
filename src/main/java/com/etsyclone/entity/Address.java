@@ -1,23 +1,23 @@
 package com.etsyclone.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "address", indexes = {
-        @Index(name = "idx_customer_id", columnList = "customer_id")
-})
+@Table(name = "address")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Address {
 
     @Id
@@ -36,9 +36,8 @@ public class Address {
     @Column(name = "zip_code", nullable = false, columnDefinition = "VARCHAR(10)", updatable = false)
     private String zipCode;
 
-    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(optional = false)
     @JoinColumn(name = "customer_id", nullable = false, updatable = false)
-    @JsonBackReference
     private User customer;
 
     public Address() {

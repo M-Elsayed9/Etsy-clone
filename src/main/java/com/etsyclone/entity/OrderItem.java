@@ -1,5 +1,7 @@
 package com.etsyclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,7 +9,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,9 +16,10 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "order_item", indexes = {
-        @Index(name = "idx_order_id", columnList = "order_id")
-})
+@Table(name = "order_item")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class OrderItem {
 
     @Id
@@ -28,14 +30,14 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false, updatable = false)
     private Order order;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, updatable = false)
     private Product product;
 
-    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
+    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT UNSIGNED", updatable = false)
     private Short quantity;
 
-    @Column(nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
+    @Column(nullable = false, columnDefinition = "DECIMAL(10,2)", updatable = false)
     private BigDecimal price;
 
     public OrderItem() {

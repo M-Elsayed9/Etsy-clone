@@ -1,6 +1,7 @@
 package com.etsyclone.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -25,7 +27,13 @@ import java.util.Set;
 @Entity
 @Table(name = "product", indexes = {
         @Index(name = "idx_product_name", columnList = "name"),
+        @Index(name = "idx_price", columnList = "price")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uk_product_name_seller_id", columnNames = {"name", "seller_id"})
 })
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Product {
 
     @Id
@@ -39,16 +47,16 @@ public class Product {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 1000)
     private String description;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
+    @Column(name = "price", nullable = false, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal price;
 
-    @Column(name = "stock", nullable = false, columnDefinition = "SMALLINT")
+    @Column(name = "stock", nullable = false, columnDefinition = "INT")
     private Integer stock;
 
     @Column(name = "image_url", columnDefinition = "VARCHAR(255)")
     private String imageUrl;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -56,12 +64,11 @@ public class Product {
     )
     private Set<Category> categories = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(optional = false)
     @JoinColumn(name = "seller_id", nullable = false, updatable = false)
-    @JsonBackReference
     private User seller;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Review> reviews = new HashSet<>();
 
     public Product() {
@@ -215,13 +222,13 @@ public class Product {
         return sb.toString();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equal(getName(), product.getName()) && Objects.equal(getSeller().getId(), product.getSeller().getId());
+        return Objects.equal(getName(), product.getName())
+                && Objects.equal(getSeller().getId(), product.getSeller().getId());
     }
 
     @Override
@@ -229,53 +236,6 @@ public class Product {
         int result = Objects.hashCode(getName());
         result = 31 * result + Objects.hashCode(getSeller().getId());
         return result;
-    }
-
-    public static class Builder {
-        private final Product product;
-
-        public Builder() {
-            product = new Product();
-        }
-
-        public Builder withName(String name) {
-            product.name = name;
-            return this;
-        }
-
-        public Builder withDescription(String description) {
-            product.description = description;
-            return this;
-        }
-
-        public Builder withPrice(BigDecimal price) {
-            product.price = price;
-            return this;
-        }
-
-        public Builder withImageUrl(String imageUrl) {
-            product.imageUrl = imageUrl;
-            return this;
-        }
-
-        public Builder withSeller(User seller) {
-            product.seller = seller;
-            return this;
-        }
-
-        public Builder withStock(Integer stock) {
-            product.setStock(stock);
-            return this;
-        }
-
-        public Builder withReviews(Set<Review> reviews) {
-            product.reviews = reviews;
-            return this;
-        }
-
-        public Product build() {
-            return product;
-        }
     }
 }
 

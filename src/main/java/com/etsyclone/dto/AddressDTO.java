@@ -7,7 +7,6 @@ public class AddressDTO {
     private String state;
     private String zipCode;
 
-    // Constructors
     public AddressDTO() {}
 
     public AddressDTO(String street, String city, String state, String zipCode) {
@@ -17,7 +16,6 @@ public class AddressDTO {
         this.zipCode = zipCode;
     }
 
-    // Getters and Setters
     public String getStreet() {
         return street;
     }

@@ -1,17 +1,13 @@
 package com.etsyclone.controller.rest;
 
-import com.etsyclone.entity.Product;
-
+import com.etsyclone.dto.ProductDTO;
 import com.etsyclone.service.ProductService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
@@ -25,31 +21,32 @@ public class ProductRestController {
     }
 
     @PostMapping("/users/{userId}")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product, @PathVariable Long userId) {
-        Product savedProduct = productService.addProduct(product, userId);
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
-    }
-
-    @GetMapping
-    public List<Product> getProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<ProductDTO> addProduct(@RequestBody ProductDTO productDTO, @PathVariable Long userId) {
+        ProductDTO savedProductDTO = productService.addProduct(productDTO, userId);
+        return new ResponseEntity<>(savedProductDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public Optional<Product> getProduct(@PathVariable Long id) {
-        return Optional.ofNullable(productService.getProduct(id));
+    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long id) {
+        ProductDTO productDTO = productService.getProduct(id);
+        return ResponseEntity.ok(productDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        List<ProductDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@RequestBody Product product, @PathVariable Long id) {
-        Product updatedProduct = productService.updateProduct(id, product);
-        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
-
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        ProductDTO updatedProductDTO = productService.updateProduct(id, productDTO);
+        return ResponseEntity.ok(updatedProductDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
-
 }

@@ -8,7 +8,6 @@ public class OrderDTO {
     private AddressDTO shippingAddress;
     private List<OrderItemDTO> orderItems;
 
-    // Constructors
     public OrderDTO() {}
 
     public OrderDTO(Long userId, AddressDTO shippingAddress, List<OrderItemDTO> orderItems) {
@@ -17,7 +16,6 @@ public class OrderDTO {
         this.orderItems = orderItems;
     }
 
-    // Getters and Setters
     public Long getUserId() {
         return userId;
     }
@@ -42,13 +40,11 @@ public class OrderDTO {
         this.orderItems = orderItems;
     }
 
-    // Nested OrderItemDTO
     public static class OrderItemDTO {
 
         private Long productId;
         private Short quantity;
 
-        // Constructors
         public OrderItemDTO() {}
 
         public OrderItemDTO(Long productId, Short quantity) {
@@ -56,7 +52,6 @@ public class OrderDTO {
             this.quantity = quantity;
         }
 
-        // Getters and Setters
         public Long getProductId() {
             return productId;
         }

@@ -3,7 +3,12 @@ package com.etsyclone.controller.rest;
 import com.etsyclone.entity.Review;
 import com.etsyclone.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
 
@@ -19,7 +24,7 @@ public class ReviewRestController {
     }
 
     @PostMapping
-    public Review createReview(Review review) {
+    public Review addReview(Review review) {
         return reviewService.saveReview(review);
     }
 

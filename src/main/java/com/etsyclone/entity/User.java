@@ -1,8 +1,9 @@
 package com.etsyclone.entity;
 
 import com.etsyclone.config.RoleName;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,6 +29,9 @@ import java.util.Set;
         @Index(name = "idx_user_name", columnList = "user_name"),
         @Index(name = "idx_email", columnList = "email")
 })
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class User {
 
     @Id
@@ -43,28 +47,29 @@ public class User {
     @Column(name = "password", columnDefinition = "VARCHAR(100)", nullable = false)
     private String password;
 
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            joinColumns = @JoinColumn(name = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false)
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonManagedReference
     private Set<Address> addresses;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonManagedReference
     private Set<Order> orders;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonManagedReference
     private List<Product> sellerProducts;
 
-    @OneToOne(mappedBy = "customer", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore
+    @OneToOne(mappedBy = "customer", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     private Cart cart;
 
     @Column(name = "stripe_customer_id", columnDefinition = "VARCHAR(50)")
@@ -77,6 +82,7 @@ public class User {
         this.userName = userName;
         this.email = email;
         this.password = passwordHash;
+        this.roles = new HashSet<>();
     }
 
     public Long getId() {
@@ -166,17 +172,14 @@ public class User {
         return roles.contains(RoleName.GUEST);
     }
 
-    @JsonIgnore
     public boolean isCustomer() {
         return roles.contains(RoleName.CUSTOMER);
     }
 
-    @JsonIgnore
     public boolean isSeller() {
         return roles.contains(RoleName.SELLER);
     }
 
-    @JsonIgnore
     public boolean isAdmin() {
         return roles.contains(RoleName.ADMIN);
     }
@@ -215,7 +218,7 @@ public class User {
         sb.append("id=").append(id);
         sb.append(", userName='").append(userName).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", roles=").append(roles);
+        sb.append(", roles=").append(roles.toString());
         sb.append('}');
         return sb.toString();
     }

@@ -7,7 +7,6 @@ public class ReviewDTO {
     private String comment;
     private Short rating;
 
-    // Constructors
     public ReviewDTO() {}
 
     public ReviewDTO(Long productId, Long customerId, String comment, Short rating) {
@@ -17,7 +16,6 @@ public class ReviewDTO {
         this.rating = rating;
     }
 
-    // Getters and Setters
     public Long getProductId() {
         return productId;
     }

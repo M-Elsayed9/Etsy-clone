@@ -27,6 +27,23 @@ public class UserRestController {
         this.userService = userService;
     }
 
+    @PostMapping("/customers")
+    public User addCustomer(@RequestBody User user) {
+        User savedUser = userService.addCustomer(user);
+        return savedUser;
+    }
+
+    @PostMapping("/sellers")
+    public User addSeller(@RequestBody User user) {
+        User savedUser = userService.addSeller(user);
+        return savedUser;
+    }
+
+    @PostMapping("/admins")
+    public User addAdmin(@RequestBody User user) {
+        User savedUser = userService.addAdmin(user);
+        return savedUser;
+    }
     @GetMapping
     public Set<User> getUsers() {
        return userService.getAllUsers();
@@ -51,24 +68,6 @@ public class UserRestController {
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         User updatedUser = userService.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
-    }
-
-    @PostMapping("/customers")
-    public User addCustomer(@RequestBody User user) {
-        User savedUser = userService.addCustomer(user);
-        return savedUser;
-    }
-
-    @PostMapping("/sellers")
-    public User addSeller(@RequestBody User user) {
-        User savedUser = userService.addSeller(user);
-        return savedUser;
-    }
-
-    @PostMapping("/admins")
-    public User addAdmin(@RequestBody User user) {
-        User savedUser = userService.addAdmin(user);
-        return savedUser;
     }
 
     @DeleteMapping("/{id}")

@@ -1,7 +1,8 @@
 package com.etsyclone.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,7 +11,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -21,25 +21,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "cart", indexes = {
-        @Index(name = "idx_customer_id", columnList = "customer_id"),
-})
+@Table(name = "cart")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "total_price", precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)")
+    @Column(name = "total_price", precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2)", nullable = false)
     private BigDecimal totalPrice;
 
-    @OneToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "customer_id", unique = true)
-    @JsonBackReference
+    @OneToOne(optional = false)
+    @JoinColumn(name = "customer_id", unique = true, nullable = false, updatable = false)
+    @JsonIgnore
     private User customer;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<CartItem> items;
 
     public Cart() {
@@ -118,18 +118,16 @@ public class Cart {
         totalPrice = getTotalPrice();
     }
 
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Cart{");
         sb.append("id=").append(id);
         sb.append(", totalPrice=").append(totalPrice);
-        sb.append(", customerId=").append(customer != null ? customer.getId() : "null");
+        sb.append(", customerId=").append(customer.getId());
         sb.append(", itemsCount=").append(items.size());
         sb.append('}');
         return sb.toString();
     }
-
 
     @Override
     public boolean equals(Object o) {

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -37,6 +37,39 @@ public class CartService {
     public Cart addCart(Cart cart) {
         return cartRepository.save(cart);
     }
+
+    @Transactional
+    public CartItemDTO addCartItem(CartItemDTO cartItemDTO, Long cartId) {
+        if (cartItemDTO.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+
+        Product product = productRepository.findById(cartItemDTO.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+
+        Optional<CartItem> existingCartItem = cart.getItems().stream()
+                .filter(item -> item.getProduct().equals(product))
+                .findFirst();
+
+        if (existingCartItem.isPresent()) {
+            CartItem cartItem = existingCartItem.get();
+            cartItem.setQuantity((short) (cartItem.getQuantity() + cartItemDTO.getQuantity()));
+            CartItem savedCartItem = cartItemRepository.save(cartItem);
+            cart.updateItem(savedCartItem);
+            return convertToDTO(savedCartItem);
+        } else {
+            CartItem cartItem = new CartItem();
+            cartItem.setProduct(product);
+            cartItem.setCart(cart);
+            cartItem.setQuantity(cartItemDTO.getQuantity());
+            CartItem savedCartItem = cartItemRepository.save(cartItem);
+            cart.addItem(savedCartItem);
+            return convertToDTO(savedCartItem);
+        }
+    }
+
     @Transactional(readOnly = true)
     public Cart getCart(Long id) {
         return cartRepository.findById(id).get();
@@ -48,78 +81,50 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public Set<CartItem> getCartItems(Long id) {
-        return cartItemRepository.findByCart_Id(id);
-    }
-
-    @Transactional
-    public CartItem addCartItem(CartItemDTO cartItemDTO, Long cartId) {
-        Product product = productRepository.findById(cartItemDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().equals(product))
-                .findFirst();
-
-        CartItem cartItem;
-        if (existingItem.isPresent()) {
-            cartItem = existingItem.get();
-            short newQuantity = (short) (cartItem.getQuantity() + cartItemDTO.getQuantity());
-
-            newQuantity = (newQuantity <= 0) ? 0 : newQuantity;
-
-            cartItem.setQuantity(newQuantity);
-        } else {
-            short initialQuantity = (cartItemDTO.getQuantity() < 0) ? 0 : cartItemDTO.getQuantity();
-
-            cartItem = new CartItem();
-            cartItem.setCart(cart);
-            cartItem.setProduct(product);
-            cartItem.setQuantity(initialQuantity);
-            cart.setTotalPrice(cart.getTotalPrice());
+    public Set<CartItemDTO> getCartItems(Long cartId) {
+        Set<CartItem> cartItems = cartItemRepository.findByCart_Id(cartId);
+        Set<CartItemDTO> cartItemDTOs = new HashSet<>();
+        for (CartItem cartItem : cartItems) {
+            cartItemDTOs.add(convertToDTO(cartItem));
         }
-
-        cart.updateItem(cartItem);
-        userRepository.save(cart.getCustomer());
-        return cartItemRepository.save(cartItem);
+        return cartItemDTOs;
     }
 
     @Transactional
-    public void deleteCartItem(Long cartItemId, Long cartId) {
+    public CartItemDTO updateCartItem(Long cartItemId, CartItemDTO cartItemDTO) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
+        short newQuantity = (short) (cartItem.getQuantity() + cartItemDTO.getQuantity());
 
-        Product product = cartItem.getProduct();
-        BigDecimal priceReduction = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-        BigDecimal newTotalPrice = cart.getTotalPrice().subtract(priceReduction);
-
-        if (newTotalPrice.compareTo(BigDecimal.ZERO) < 0) {
-            newTotalPrice = BigDecimal.ZERO;
+        if (newQuantity <= 0) {
+            cartItemRepository.delete(cartItem);
+            cartItem.getCart().removeItem(cartItem);
+            return null;
+        } else {
+            cartItem.setQuantity(newQuantity);
+            CartItem savedCartItem = cartItemRepository.save(cartItem);
+            cartItem.getCart().updateItem(savedCartItem);
+            return convertToDTO(savedCartItem);
         }
+    }
 
-        cart.setTotalPrice(newTotalPrice);
-        cart.getItems().remove(cartItem);
-        cartRepository.save(cart);
-        cartItemRepository.deleteById(cartItemId);
+    @Transactional
+    public void deleteCartItem(Long itemId, Long cartId) {
+        CartItem cartItem = cartItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found with id: " + itemId + " in cart: " + cartId));
+        cartItemRepository.delete(cartItem);
+        cartItem.getCart().removeItem(cartItem);
     }
 
     @Transactional
     public void deleteAllCartItems(Long cartId) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
-
-        cart.clearCart();
-
-        cart.setTotalPrice(BigDecimal.ZERO);
-
-        // Save the updated cart to persist the changes
-        cartRepository.save(cart);
+        Set<CartItem> cartItems = cartItemRepository.findByCart_Id(cartId);
+        cartItemRepository.deleteAll(cartItems);
+        cartItems.forEach(cartItem -> cartItem.getCart().removeItem(cartItem));
     }
 
-
+    private CartItemDTO convertToDTO(CartItem cartItem) {
+        return new CartItemDTO(cartItem.getProduct().getId(), cartItem.getQuantity());
+    }
 }

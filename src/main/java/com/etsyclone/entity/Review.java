@@ -1,7 +1,6 @@
 package com.etsyclone.entity;
 
 import com.google.common.base.Objects;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,7 +15,6 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "review", indexes = {
-        @Index(name = "idx_product_id", columnList = "product_id"),
         @Index(name = "idx_rating", columnList = "rating")
 })
 public class Review {
@@ -24,7 +22,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, updatable = false)
     private Product product;
 
@@ -146,7 +144,6 @@ public class Review {
         sb.append('}');
         return sb.toString();
     }
-
 
     @Override
     public boolean equals(Object o) {

@@ -1,23 +1,22 @@
 package com.etsyclone.service;
 
+import com.etsyclone.dto.ProductDTO;
 import com.etsyclone.entity.Product;
 import com.etsyclone.entity.User;
 import com.etsyclone.repository.ProductRepository;
 import com.etsyclone.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private Product newProduct;
 
     @Autowired
     public ProductService(ProductRepository productRepository, UserRepository userRepository) {
@@ -26,74 +25,81 @@ public class ProductService {
     }
 
     @Transactional
-    public Product addProduct(Product product, Long userId) {
+    public ProductDTO addProduct(ProductDTO productDTO, Long userId) {
         User seller = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User with id " + userId + " not found"));
+        Product product = convertToEntity(productDTO);
         product.setSeller(seller);
-        newProduct = productRepository.save(product);
-        return newProduct;
+        Product savedProduct = productRepository.save(product);
+        seller.addProduct(savedProduct);
+        return convertToDTO(savedProduct);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDTO getProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
+        return convertToDTO(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Transactional
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
-    }
-
-    @Transactional(readOnly = true)
-    public Product getProduct(Long id) {
-        return productRepository.findById(id).get();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Product getProductByName(String name) {
-        return productRepository.findByName(name);
-    }
-
-    @Transactional(readOnly = true)
-    public Integer getProductsCount() {
-        return productRepository.findAll().size();
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Product> getProductsByPrice(Double price) {
-        return productRepository.findByPrice(price);
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Product> getProductsByPriceBetween(BigDecimal price1, BigDecimal price2) {
-        return productRepository.findByPriceBetween(price1, price2);
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Product> getProductsByPriceLessThanEqual(Double price) {
-        return productRepository.findByPriceLessThanEqual(price);
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Product> getProductsByPriceGreaterThanEqual(Double price) {
-        return productRepository.findByPriceGreaterThanEqual(price);
-    }
-
-    @Transactional
-    public Product updateProduct(Long id, Product productDetails) {
+    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product productToUpdate = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
 
-        productToUpdate.setDescription(productDetails.getDescription());
-        productToUpdate.setPrice(productDetails.getPrice());
-        productToUpdate.setImageUrl(productDetails.getImageUrl());
-        productToUpdate.setStock(productDetails.getStock());
+        if (productDTO.getDescription() != null) {
+            productToUpdate.setDescription(productDTO.getDescription());
+        }
+        if (productDTO.getPrice() != null) {
+            productToUpdate.setPrice(productDTO.getPrice());
+        }
+        if (productDTO.getImageUrl() != null) {
+            productToUpdate.setImageUrl(productDTO.getImageUrl());
+        }
+        if (productDTO.getStock() != null) {
+            int newStock = productToUpdate.getStock() + productDTO.getStock();
+            if (newStock < 0) {
+                throw new IllegalArgumentException("Resulting stock cannot be negative.");
+            }
+            productToUpdate.setStock(newStock);
+        }
 
-        return productRepository.save(productToUpdate);
+        Product updatedProduct = productRepository.save(productToUpdate);
+        return convertToDTO(updatedProduct);
     }
+
 
     @Transactional
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
+        productRepository.delete(product);
+        product.getSeller().removeProduct(product);
+    }
+
+    private ProductDTO convertToDTO(Product product) {
+        return new ProductDTO(
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getImageUrl()
+        );
+    }
+
+    private Product convertToEntity(ProductDTO productDTO) {
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setStock(productDTO.getStock());
+        product.setImageUrl(productDTO.getImageUrl());
+        return product;
     }
 }

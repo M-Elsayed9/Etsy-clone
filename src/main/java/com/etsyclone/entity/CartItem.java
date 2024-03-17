@@ -1,40 +1,32 @@
 package com.etsyclone.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.base.Objects;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Index;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "cart_item", indexes = {
-        @Index(name = "idx_cart_id", columnList = "cart_id")
-})
+@Table(name = "cart_item")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "cart_id", nullable = false, updatable = false)
-    @JsonBackReference
     private Cart cart;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false, updatable = false)
     private Product product;
 
-    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
+    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
     private Short quantity;
 
     public CartItem() {
@@ -73,6 +65,10 @@ public class CartItem {
 
     public Short getQuantity() {
         return quantity;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
     public void setQuantity(Short quantity) {
@@ -115,10 +111,5 @@ public class CartItem {
         int result = Objects.hashCode(getCart().getId());
         result = 31 * result + Objects.hashCode(getProduct().getId());
         return result;
-    }
-
-
-    public BigDecimal getTotalPrice() {
-        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }
