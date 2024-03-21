@@ -2,10 +2,12 @@ package com.etsyclone.dto;
 
 public class AddressDTO {
 
+
     private String street;
     private String city;
     private String state;
     private String zipCode;
+    private Long customerId;
 
     public AddressDTO() {}
 
@@ -14,6 +16,23 @@ public class AddressDTO {
         this.city = city;
         this.state = state;
         this.zipCode = zipCode;
+    }
+
+    public AddressDTO(String street, String city, String state, String zipCode, Long customerId) {
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.zipCode = zipCode;
+        this.customerId = customerId;
+    }
+
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public String getStreet() {
@@ -46,5 +65,12 @@ public class AddressDTO {
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    public Long getId() {
+        return customerId;
+    }
+    public void setId(Long customerId) {
+        this.customerId = customerId;
     }
 }

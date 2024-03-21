@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -36,8 +34,7 @@ public class UserService {
                     roleService.addRole(newRole);
                     return newRole;
                 });
-
-        user.setRoles(new HashSet<>(Collections.singletonList(role)));
+        user.addRole(role);
         return userRepository.save(user);
     }
 

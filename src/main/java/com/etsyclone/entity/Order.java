@@ -104,10 +104,6 @@ public class Order {
         orderItem.setOrder(this);
     }
 
-    public void clearOrderItems() {
-        orderItems.clear();
-    }
-
     public void removeOrderItem(OrderItem orderItem) {
         orderItems.remove(orderItem);
         orderItem.setOrder(null);
@@ -144,7 +140,6 @@ public class Order {
         sb.append('}');
         return sb.toString();
     }
-
 
     @Override
     public boolean equals(Object o) {

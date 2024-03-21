@@ -1,5 +1,8 @@
 package com.etsyclone.entity;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.etsyclone.config.RoleName;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,9 +23,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user", indexes = {
@@ -32,7 +37,7 @@ import java.util.Set;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +53,7 @@ public class User {
     private String password;
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id", nullable = false),
@@ -71,9 +76,6 @@ public class User {
     @JsonIgnore
     @OneToOne(mappedBy = "customer", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     private Cart cart;
-
-    @Column(name = "stripe_customer_id", columnDefinition = "VARCHAR(50)")
-    private String stripeCustomerId;
 
     public User() {
     }
@@ -184,6 +186,38 @@ public class User {
         return roles.contains(RoleName.ADMIN);
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> (GrantedAuthority) () -> "ROLE_" + role.getRole())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void addOrder(Order order) {
         orders.add(order);
         order.setCustomer(this);
@@ -202,14 +236,6 @@ public class User {
     public void removeProduct(Product product) {
         sellerProducts.remove(product);
         product.setSeller(null);
-    }
-
-    public String getStripeCustomerId() {
-        return stripeCustomerId;
-    }
-
-    public void setStripeCustomerId(String stripeCustomerId) {
-        this.stripeCustomerId = stripeCustomerId;
     }
 
     @Override
@@ -236,5 +262,9 @@ public class User {
         int result = Objects.hashCode(getUserName());
         result = 31 * result + Objects.hashCode(getEmail());
         return result;
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
     }
 }

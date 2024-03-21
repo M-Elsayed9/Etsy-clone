@@ -1,5 +1,8 @@
 package com.etsyclone.entity;
 
+import org.springframework.security.core.GrantedAuthority;
+
+
 import com.etsyclone.config.RoleName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +20,7 @@ import com.google.common.base.Objects;
 @Table(name = "role", indexes = {
         @Index(name = "idx_role", columnList = "role")
 })
-public class Role {
+public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +55,11 @@ public class Role {
 
     public void setRole(RoleName role) {
         this.role = role;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_" + role.name();
     }
 
     @Override

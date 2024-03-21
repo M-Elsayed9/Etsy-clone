@@ -1,18 +1,12 @@
 package com.etsyclone.controller.rest;
 
-import com.etsyclone.entity.Order;
+import com.etsyclone.dto.AddressDTO;
+import com.etsyclone.dto.OrderDTO;
 import com.etsyclone.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -21,38 +15,59 @@ import java.util.Set;
 public class OrderRestController {
 
     private final OrderService orderService;
+
     @Autowired
     public OrderRestController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @PostMapping("/customers/{customerId}")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order, @RequestParam Long customerId) {
-        Order savedOrder = orderService.addOrder(order, customerId);
-        return ResponseEntity.ok(savedOrder);
-    }
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<OrderDTO> createOrderFromCart(@PathVariable Long userId, @RequestParam Long shippingAddressId) {
 
-    @GetMapping
-    public Set<Order> getOrders() {
-        return orderService.getAllOrders();
+            OrderDTO savedOrderDTO = orderService.createOrderFromUserCart(userId, shippingAddressId);
+            return new ResponseEntity<>(savedOrderDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
-        return orderService.getOrder(id);
-    }
-    @GetMapping("/{id}/items")
-    public Set<Order> getOrderItems(@PathVariable Long id) {
-        return orderService.getOrderItems(id);
+    public ResponseEntity<OrderDTO> getOrder(@PathVariable Long id) {
+        try {
+            OrderDTO orderDTO = orderService.getOrderDTO(id);
+            return ResponseEntity.ok(orderDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Set<OrderDTO>> getUserOrders(@PathVariable Long userId) {
+        try {
+            Set<OrderDTO> orders = orderService.getOrdersByUserId(userId);
+            return ResponseEntity.ok(orders);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Note: Update and Delete endpoints might not be applicable if you want the orders to be immutable once created.
+    // You can remove these if they don't fit your business logic.
+
     @PutMapping("/{id}")
-    public void updateOrder(@RequestBody Order order) {
-        orderService.updateOrder(order, order.getCustomer().getId());
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
+        try {
+            OrderDTO updatedOrderDTO = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(updatedOrderDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOrder(@PathVariable Long id) {
-        orderService.deleteOrder(id);
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        try {
+            orderService.deleteOrder(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

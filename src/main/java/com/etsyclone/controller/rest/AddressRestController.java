@@ -1,11 +1,13 @@
 package com.etsyclone.controller.rest;
 
-import com.etsyclone.entity.Address;
+import com.etsyclone.dto.AddressDTO;
 import com.etsyclone.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/addresses")
@@ -18,32 +20,33 @@ public class AddressRestController {
         this.addressService = addressService;
     }
 
-    @PostMapping
-    public Address addAddress(@RequestBody Address address) {
-        return addressService.saveAddress(address);
-    }
-    @GetMapping
-    public List<Address> getAllAddresses() {
-        return addressService.getAllAddresses();
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable Long userId) {
+        AddressDTO savedAddressDTO = addressService.addAddress(addressDTO, userId);
+        return new ResponseEntity<>(savedAddressDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public Address getAddressById(@PathVariable Long id) {
-        return addressService.getAddress(id);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Set<AddressDTO>> getAllAddressesByUserId(@PathVariable Long userId) {
+        Set<AddressDTO> addressDTOs = addressService.getAllAddressesByUserId(userId);
+        return ResponseEntity.ok(addressDTOs);
     }
 
-    @GetMapping("/{id}/user")
-    public Address getAddressByUserId(@PathVariable Long userId) {
-        return addressService.getAddressByCustomerId(userId);
+    @GetMapping("/{addressId}")
+    public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long addressId) {
+        AddressDTO addressDTO = addressService.getAddressDTO(addressId);
+        return ResponseEntity.ok(addressDTO);
     }
 
-    @PutMapping("/{id}")
-    public void updateAddress(@RequestBody Address address) {
-        addressService.updateAddress(address);
+    @PutMapping("/{addressId}")
+    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressId, @RequestBody AddressDTO addressDTO) {
+        AddressDTO updatedAddressDTO = addressService.updateAddress(addressId, addressDTO);
+        return ResponseEntity.ok(updatedAddressDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteAddress(@PathVariable Long id) {
-        addressService.deleteAddress(id);
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId) {
+        addressService.deleteAddress(addressId);
+        return ResponseEntity.noContent().build();
     }
 }

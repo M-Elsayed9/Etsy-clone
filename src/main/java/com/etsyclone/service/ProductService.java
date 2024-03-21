@@ -74,7 +74,6 @@ public class ProductService {
         return convertToDTO(updatedProduct);
     }
 
-
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)

@@ -1,16 +1,16 @@
 package com.etsyclone.dto;
 
-import java.util.List;
+import java.util.Set;
 
 public class OrderDTO {
 
     private Long userId;
     private AddressDTO shippingAddress;
-    private List<OrderItemDTO> orderItems;
+    private Set<OrderItemDTO> orderItems;
 
     public OrderDTO() {}
 
-    public OrderDTO(Long userId, AddressDTO shippingAddress, List<OrderItemDTO> orderItems) {
+    public OrderDTO(Long userId, AddressDTO shippingAddress, Set<OrderItemDTO> orderItems) {
         this.userId = userId;
         this.shippingAddress = shippingAddress;
         this.orderItems = orderItems;
@@ -32,11 +32,11 @@ public class OrderDTO {
         this.shippingAddress = shippingAddress;
     }
 
-    public List<OrderItemDTO> getOrderItems() {
+    public Set<OrderItemDTO> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(List<OrderItemDTO> orderItems) {
+    public void setOrderItems(Set<OrderItemDTO> orderItems) {
         this.orderItems = orderItems;
     }
 
