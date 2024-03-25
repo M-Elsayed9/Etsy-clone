@@ -1,11 +1,12 @@
 package com.etsyclone.config;
-import com.etsyclone.entity.Category;
+import com.etsyclone.category.Category;
+import com.etsyclone.role.RoleName;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.etsyclone.entity.Role;
-import com.etsyclone.repository.RoleRepository;
-import com.etsyclone.repository.CategoryRepository;
+import com.etsyclone.role.Role;
+import com.etsyclone.role.RoleRepository;
+import com.etsyclone.category.CategoryRepository;
 
 @Configuration
 public class DataLoader {
