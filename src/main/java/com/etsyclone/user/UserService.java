@@ -6,6 +6,12 @@ import com.etsyclone.role.Role;
 import com.etsyclone.role.RoleName;
 import com.etsyclone.cart.CartService;
 import com.etsyclone.role.RoleService;
+import com.etsyclone.security.JWTGenerator;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +25,46 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final CartService cartService;
+    private AuthenticationManager authenticationManager;
+    private PasswordEncoder passwordEncoder;
+    private JWTGenerator jwtGenerator;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleService roleService, CartService cartService) {
+    public UserService(UserRepository userRepository, RoleService roleService, CartService cartService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.cartService = cartService;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtGenerator = jwtGenerator;
     }
 
+    @Transactional
+    public String login(UserDTO userDTO) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userDTO.getUsername(),
+                        userDTO.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtGenerator.generateToken(authentication);
+        return token;
+    }
+
+    @Transactional
+    public UserDTO signUp(UserDTO userDTO) {
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException("Username is taken!");
+        }
+        User user = new User(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = addCustomer(user);
+        return new UserDTO(savedUser.getUsername(), savedUser.getEmail());
+    }
+
+    @Transactional
+    public String logout() {
+        SecurityContextHolder.clearContext();
+        return "Logged out";
+    }
     @Transactional
     public User addUser(User user, RoleName roleName) {
         Role role = roleService.getRoleByName(roleName)
@@ -66,6 +104,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
     public Set<User> getAllUsers() {
         return Set.copyOf(userRepository.findAll());
     }
@@ -76,7 +119,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserByUserName(String userName) {
+    public Optional<User> getUserByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
 
@@ -101,4 +144,5 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
 }

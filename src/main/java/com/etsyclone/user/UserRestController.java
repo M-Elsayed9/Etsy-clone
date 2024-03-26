@@ -25,22 +25,34 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @PostMapping("/customers")
-    public User addCustomer(@RequestBody User user) {
-        User savedUser = userService.addCustomer(user);
-        return savedUser;
+    @PostMapping("/auth/login")
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+        String token = userService.login(userDTO);
+        return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/sellers")
-    public User addSeller(@RequestBody User user) {
-        User savedUser = userService.addSeller(user);
-        return savedUser;
+    @PostMapping("/auth/signout")
+    public ResponseEntity<String> signout(@RequestBody UserDTO userDTO) {
+        String token = userService.logout();
+        return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/admins")
-    public User addAdmin(@RequestBody User user) {
-        User savedUser = userService.addAdmin(user);
-        return savedUser;
+    @PostMapping("/auth/customers")
+    public ResponseEntity<UserDTO> signup(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.signUp(userDTO);
+        return ResponseEntity.ok(authenticatedUser);
+    }
+
+    @PostMapping("/auth/sellers")
+    public ResponseEntity<UserDTO> authenticateSeller(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.signUp(userDTO);
+        return ResponseEntity.ok(authenticatedUser);
+    }
+
+    @PostMapping("/auth/admins")
+    public ResponseEntity<UserDTO> authenticateAdmin(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.signUp(userDTO);
+        return ResponseEntity.ok(authenticatedUser);
     }
     @GetMapping
     public Set<User> getUsers() {
