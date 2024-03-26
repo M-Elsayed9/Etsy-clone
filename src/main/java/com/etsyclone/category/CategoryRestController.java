@@ -1,6 +1,7 @@
 package com.etsyclone.category;
 
 import com.etsyclone.product.Product;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ public class CategoryRestController {
 
     private final CategoryService categoryService;
 
+    @Autowired
     public CategoryRestController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
@@ -40,7 +42,7 @@ public class CategoryRestController {
         categoryService.updateCategory(category);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void deleteCategory(Long id) {
         categoryService.deleteCategory(id);
     }

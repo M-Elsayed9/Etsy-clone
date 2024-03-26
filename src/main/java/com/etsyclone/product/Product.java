@@ -80,7 +80,6 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Review> reviews = new HashSet<>();
 
-
     public Product(String name, String description, BigDecimal price, Integer stock) {
         this.name = name;
         this.description = description;

@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Index;
 
 import com.google.common.base.Objects;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

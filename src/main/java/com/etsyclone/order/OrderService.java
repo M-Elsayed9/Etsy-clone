@@ -5,15 +5,12 @@ import com.etsyclone.address.AddressRepository;
 import com.etsyclone.cart.Cart;
 import com.etsyclone.cart.CartRepository;
 import com.etsyclone.cartItem.CartItem;
-import com.etsyclone.order.Order;
-import com.etsyclone.order.OrderRepository;
 import com.etsyclone.orderitem.OrderItem;
 import com.etsyclone.orderitem.OrderItemRepository;
 import com.etsyclone.product.Product;
 import com.etsyclone.product.ProductRepository;
 import com.etsyclone.user.User;
 import com.etsyclone.user.UserRepository;
-import com.etsyclone.order.OrderDTO;
 import com.etsyclone.order.OrderDTO.OrderItemDTO;
 import com.etsyclone.address.AddressDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +132,7 @@ public class OrderService {
 
         Set<OrderItem> updatedOrderItems = orderDTO.getOrderItems().stream()
                 .map(this::convertToEntity)
-                .peek(orderItem -> orderItem.setOrder(orderToUpdate)) // Set the order for each item
+                .peek(orderItem -> orderItem.setOrder(orderToUpdate))
                 .collect(Collectors.toSet());
 
         orderToUpdate.setOrderItems(updatedOrderItems);
@@ -150,15 +147,13 @@ public class OrderService {
         User customer = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.getUserId()));
 
-        // Assuming an address service or method is available to fetch the address entity
         Address shippingAddress = addressRepository.findById(dto.getShippingAddress().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + dto.getShippingAddress().getId()));
 
         Order order = new Order();
         order.setCustomer(customer);
         order.setAddress(shippingAddress);
-        order.setTotalPrice(calculateTotalPrice(dto.getOrderItems())); // Calculate based on the items in the DTO
-        // Set other properties from dto to order as needed
+        order.setTotalPrice(calculateTotalPrice(dto.getOrderItems()));
 
         return order;
     }
@@ -170,7 +165,7 @@ public class OrderService {
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(product);
         orderItem.setQuantity(dto.getQuantity());
-        orderItem.setPrice(product.getPrice()); // Assuming price is directly taken from the product
+        orderItem.setPrice(product.getPrice());
 
         return orderItem;
     }
@@ -184,6 +179,4 @@ public class OrderService {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-
 }

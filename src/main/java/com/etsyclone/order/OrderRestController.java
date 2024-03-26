@@ -45,9 +45,6 @@ public class OrderRestController {
         }
     }
 
-    // Note: Update and Delete endpoints might not be applicable if you want the orders to be immutable once created.
-    // You can remove these if they don't fit your business logic.
-
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
         try {

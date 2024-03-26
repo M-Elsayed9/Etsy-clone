@@ -59,7 +59,6 @@ public class Category {
         return sb.toString();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

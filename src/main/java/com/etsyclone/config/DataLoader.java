@@ -15,8 +15,7 @@ public class DataLoader {
     CommandLineRunner initDatabase(RoleRepository roleRepository, CategoryRepository categoryRepository) {
         return args -> {
             if (roleRepository.count() == 0) {
-                // ROLES = { 'ADMIN', 'CUSTOMER', 'SELLER', 'GUEST }
-                roleRepository.save(new Role(RoleName.GUEST));
+                // ROLES = { 'ADMIN', 'CUSTOMER', 'SELLER' }
                 roleRepository.save(new Role(RoleName.ADMIN));
                 roleRepository.save(new Role(RoleName.CUSTOMER));
                 roleRepository.save(new Role(RoleName.SELLER));
