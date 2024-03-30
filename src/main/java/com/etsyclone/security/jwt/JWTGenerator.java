@@ -1,4 +1,4 @@
-package com.etsyclone.security;
+package com.etsyclone.security.jwt;
 
 import java.util.Date;
 
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class JWTGenerator {
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-
     private static final long JWT_EXPIRATION = 70000;
 
     public String generateToken(Authentication authentication) {
@@ -53,5 +52,4 @@ public class JWTGenerator {
             throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect",ex.fillInStackTrace());
         }
     }
-
 }

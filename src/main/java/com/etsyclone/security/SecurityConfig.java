@@ -1,5 +1,7 @@
 package com.etsyclone.security;
 
+import com.etsyclone.security.jwt.JWTAuthenticationFilter;
+import com.etsyclone.security.jwt.JwtAuthEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/users/auth/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/signout", "/auth/signup").permitAll()
+                        .requestMatchers("/auth/login", "/auth/signout", "/auth/register").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 //                        .requestMatchers(HttpMethod.DELETE, "/api/users").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.DELETE, "/api/orders").hasRole("ADMIN")
@@ -66,7 +68,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public  JWTAuthenticationFilter jwtAuthenticationFilter() {
+    public JWTAuthenticationFilter jwtAuthenticationFilter() {
         return new JWTAuthenticationFilter();
     }
 }
