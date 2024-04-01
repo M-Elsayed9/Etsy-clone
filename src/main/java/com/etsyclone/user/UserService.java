@@ -6,7 +6,7 @@ import com.etsyclone.role.Role;
 import com.etsyclone.role.RoleName;
 import com.etsyclone.cart.CartService;
 import com.etsyclone.role.RoleService;
-import com.etsyclone.security.JWTGenerator;
+import com.etsyclone.security.jwt.JWTGenerator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -51,13 +51,34 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO signUp(UserDTO userDTO) {
+    public UserDTO customerRegistration(UserDTO userDTO) {
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException("Username is taken!");
+        }
+
+        User user = new User(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = addCustomer(user);
+        return new UserDTO(savedUser.getUsername(), savedUser.getEmail(), savedUser.getPassword());
+    }
+
+    @Transactional
+    public UserDTO sellerRegistration(UserDTO userDTO) {
         if(userRepository.existsByUsername(userDTO.getUsername())) {
             throw new RuntimeException("Username is taken!");
         }
         User user = new User(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
-        User savedUser = addCustomer(user);
-        return new UserDTO(savedUser.getUsername(), savedUser.getEmail());
+        User savedUser = addSeller(user);
+        return new UserDTO(savedUser.getUsername(), savedUser.getEmail(), savedUser.getPassword());
+    }
+
+    @Transactional
+    public UserDTO adminRegistration(UserDTO userDTO) {
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException("Username is taken!");
+        }
+        User user = new User(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = addAdmin(user);
+        return new UserDTO(savedUser.getUsername(), savedUser.getEmail(), savedUser.getPassword());
     }
 
     @Transactional

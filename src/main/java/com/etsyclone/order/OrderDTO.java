@@ -1,72 +1,47 @@
 package com.etsyclone.order;
 
 import com.etsyclone.address.AddressDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrderDTO {
 
-    private Long userId;
+    private String username;
     private AddressDTO shippingAddress;
+    private BigDecimal totalPrice;
     private Set<OrderItemDTO> orderItems;
 
-    public OrderDTO() {}
-
-    public OrderDTO(Long userId, AddressDTO shippingAddress, Set<OrderItemDTO> orderItems) {
-        this.userId = userId;
-        this.shippingAddress = shippingAddress;
-        this.orderItems = orderItems;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total price cannot be negative");
+        }
+        this.totalPrice = totalPrice;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public AddressDTO getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(AddressDTO shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public Set<OrderItemDTO> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(Set<OrderItemDTO> orderItems) {
-        this.orderItems = orderItems;
-    }
-
+    @Getter
+    @Setter
+    @NoArgsConstructor
     public static class OrderItemDTO {
 
         private Long productId;
         private Short quantity;
-
-        public OrderItemDTO() {}
 
         public OrderItemDTO(Long productId, Short quantity) {
             this.productId = productId;
             this.quantity = quantity;
         }
 
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-
-        public Short getQuantity() {
-            return quantity;
-        }
-
         public void setQuantity(Short quantity) {
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity cannot be negative");
+            }
             this.quantity = quantity;
         }
     }

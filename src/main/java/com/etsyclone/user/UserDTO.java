@@ -1,9 +1,12 @@
 package com.etsyclone.user;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class UserDTO {
 
@@ -15,18 +18,5 @@ public class UserDTO {
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public UserDTO(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User toUser() {
-        return new User(username, email, password);
-    }
-
-    public static UserDTO fromUser(User user) {
-        return new UserDTO(user.getUsername(), user.getEmail(), user.getPassword());
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,18 +37,13 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/home").hasRole("CUSTOMER")
                         .requestMatchers("/api/users/auth/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/signout", "/auth/register").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-//                        .requestMatchers(HttpMethod.DELETE, "/api/users").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/orders").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/products").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("SELLER")
-//                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
-//                        .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("CUSTOMER")
-//                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/orders").hasRole("ADMIN")
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/about").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults());
 

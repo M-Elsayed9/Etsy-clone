@@ -1,30 +1,35 @@
 package com.etsyclone.cartItem;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class CartItemDTO {
 
     private Long productId;
     private Short quantity;
-
-    public CartItemDTO() {}
 
     public CartItemDTO(Long productId, Short quantity) {
         this.productId = productId;
         this.quantity = quantity;
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public Short getQuantity() {
-        return quantity;
-    }
-
     public void setQuantity(Short quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("CartItem{");
+        sb.append(", productId=").append(productId);
+        sb.append(", quantity=").append(quantity);
+        sb.append('}');
+        return sb.toString();
     }
 }

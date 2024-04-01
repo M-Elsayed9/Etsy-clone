@@ -1,7 +1,14 @@
 package com.etsyclone.product;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProductDTO {
 
     private String name;
@@ -9,8 +16,6 @@ public class ProductDTO {
     private BigDecimal price;
     private Integer stock;
     private String imageUrl;
-
-    public ProductDTO() {}
 
     public ProductDTO(String name, String description, BigDecimal price, Integer stock, String imageUrl) {
         this.name = name;
@@ -20,43 +25,17 @@ public class ProductDTO {
         this.imageUrl = imageUrl;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
     public void setPrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be negative");
+        }
         this.price = price;
     }
 
-    public Integer getStock() {
-        return stock;
-    }
-
     public void setStock(Integer stock) {
+        if(stock < 0) {
+            throw new IllegalArgumentException("Stock cannot be negative");
+        }
         this.stock = stock;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 }

@@ -38,20 +38,20 @@ public class UserRestController {
     }
 
     @PostMapping("/auth/customers")
-    public ResponseEntity<UserDTO> signup(@RequestBody UserDTO userDTO) {
-        UserDTO authenticatedUser = userService.signUp(userDTO);
+    public ResponseEntity<UserDTO> customerRegistration(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.customerRegistration(userDTO);
         return ResponseEntity.ok(authenticatedUser);
     }
 
     @PostMapping("/auth/sellers")
-    public ResponseEntity<UserDTO> authenticateSeller(@RequestBody UserDTO userDTO) {
-        UserDTO authenticatedUser = userService.signUp(userDTO);
+    public ResponseEntity<UserDTO> sellerRegistration(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.sellerRegistration(userDTO);
         return ResponseEntity.ok(authenticatedUser);
     }
 
     @PostMapping("/auth/admins")
-    public ResponseEntity<UserDTO> authenticateAdmin(@RequestBody UserDTO userDTO) {
-        UserDTO authenticatedUser = userService.signUp(userDTO);
+    public ResponseEntity<UserDTO> adminRegistration(@RequestBody UserDTO userDTO) {
+        UserDTO authenticatedUser = userService.adminRegistration(userDTO);
         return ResponseEntity.ok(authenticatedUser);
     }
     @GetMapping
