@@ -11,7 +11,7 @@ import com.etsyclone.product.Product;
 import com.etsyclone.product.ProductRepository;
 import com.etsyclone.user.User;
 import com.etsyclone.user.UserRepository;
-import com.etsyclone.order.OrderDTO.OrderItemDTO;
+import com.etsyclone.orderitem.OrderItemDTO;
 import com.etsyclone.address.AddressDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,6 +75,7 @@ public class OrderService {
             product.setStock((product.getStock() - cartItem.getQuantity()));
             productRepository.save(product);
         }
+
         order.setOrderItems(orderItems);
         order.setTotalPrice(totalOrderPrice);
         order.setAddress(shippingAddress);
@@ -119,8 +120,8 @@ public class OrderService {
         return dto;
     }
 
-    private OrderDTO.OrderItemDTO convertToOrderItemDTO(OrderItem orderItem) {
-        return new OrderItemDTO(orderItem.getProduct().getId(), orderItem.getQuantity());
+    private OrderItemDTO convertToOrderItemDTO(OrderItem orderItem) {
+        return new OrderItemDTO(orderItem.getProduct().getId(), orderItem.getQuantity(), orderItem.getPrice());
     }
 
     @Transactional

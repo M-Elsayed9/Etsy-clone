@@ -1,6 +1,7 @@
 package com.etsyclone.order;
 
 import com.etsyclone.address.AddressDTO;
+import com.etsyclone.orderitem.OrderItemDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,36 +14,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class OrderDTO {
 
-    private String username;
+    private Long userId;
     private AddressDTO shippingAddress;
-    private BigDecimal totalPrice;
     private Set<OrderItemDTO> orderItems;
+    private BigDecimal total;
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Total price cannot be negative");
+    public void setTotal(BigDecimal total) {
+        if (total.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total cannot be negative");
         }
-        this.totalPrice = totalPrice;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class OrderItemDTO {
-
-        private Long productId;
-        private Short quantity;
-
-        public OrderItemDTO(Long productId, Short quantity) {
-            this.productId = productId;
-            this.quantity = quantity;
-        }
-
-        public void setQuantity(Short quantity) {
-            if (quantity < 0) {
-                throw new IllegalArgumentException("Quantity cannot be negative");
-            }
-            this.quantity = quantity;
-        }
+        this.total = total;
     }
 }
