@@ -1,63 +1,50 @@
-.navbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e1e1e1;
-  padding: 10px 0;
-}
+<style>
+    /* Navbar overall styling */
+    .navbar {
+        background-color: #f4f4f4; /* Light grey background */
+        border-bottom: 1px solid #ddd; /* Light border under the navbar */
+    }
 
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .navbar-brand {
+        font-weight: bold;
+        color: #c27ba0; /* Custom Etsy-like purple for the logo */
+    }
 
-.navbar-brand {
-  font-size: 24px;
-  color: #f56060;
-  text-decoration: none;
-  margin-left: 20px;
-}
+    .navbar-nav .nav-link {
+        color: #333; /* Darker text for better contrast */
+    }
 
-.search-bar {
-  flex-grow: 1;
-  margin: 0 20px;
-}
+    .navbar-nav .nav-link:hover {
+        color: #c27ba0; /* Highlight text on hover */
+    }
 
-.search-form {
-  display: flex;
-  width: 100%;
-}
+    /* Categories dropdown styling */
+    .dropdown-menu {
+        border-radius: 0; /* Remove the default border radius for a sharper look */
+        border-color: #c27ba0; /* Border color to match the theme */
+    }
 
-.search-form input[type="search"] {
-  flex-grow: 1;
-  padding: 8px;
-  border: 1px solid #e1e1e1;
-  border-right: none;
-}
+    .dropdown-item:hover {
+        background-color: #c27ba0; /* Change background on hover */
+        color: #fff; /* White text on hover */
+    }
 
-.search-form button {
-  padding: 8px 12px;
-  background-color: #f56060;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
+    /* Search bar styling */
+    .form-control {
+        border-radius: 20px; /* Rounded corners for the search bar */
+    }
 
-.navbar-nav {
-  list-style: none;
-  display: flex;
-  margin-right: 20px;
-}
+    /* Sign in/Sign out and Cart icons */
+    .bi {
+        margin-right: 8px; /* Add some space before the text */
+    }
 
-.nav-item {
-  margin-left: 20px;
-}
+    .bi-cart {
+        color: #c27ba0; /* Matching the theme's color */
+    }
 
-.nav-link {
-  text-decoration: none;
-  color: #333333;
-  font-size: 16px;
-}
-
-.nav-link:hover {
-  color: #f56060;
-}
+    .search-bar {
+                max-width: 500px; /* Adjust the width as needed */
+                width: 100%;
+            }
+</style>

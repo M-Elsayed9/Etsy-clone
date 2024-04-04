@@ -1,0 +1,25 @@
+/* Footer styling */
+.footer {
+    background-color: #f4f4f4; /* Light background color for the footer */
+    border-top: 1px solid #ddd; /* Light border for a subtle separation */
+}
+
+.footer h5 {
+    color: #333; /* Dark color for titles */
+    margin-bottom: 1rem; /* Spacing below titles */
+}
+
+.footer p, .footer a {
+    color: #666; /* Lighter text color for readability */
+    font-size: 0.9rem; /* Slightly smaller font size */
+}
+
+.footer a:hover {
+    color: #c27ba0; /* Highlight color on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
+/* Social Icons */
+.bi {
+    margin-right: 8px; /* Space before the social media text */
+}

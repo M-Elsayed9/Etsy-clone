@@ -1,0 +1,55 @@
+/* home.css content */
+
+/* General body styling */
+body {
+    background-color: #f8f8f8; /* Soft background color */
+    color: #333; /* Primary text color */
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: none; /* Remove default border */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover effect */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Slightly lift the card on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.card-img-top {
+    width: 100%; /* Ensure image covers the card width */
+    height: 200px; /* Fixed height for consistency */
+    object-fit: cover; /* Cover the set height maintaining aspect ratio */
+}
+
+.card-body {
+    padding: 1rem; /* Spacing inside the card */
+}
+
+.card-title {
+    color: #333; /* Title color */
+    margin-bottom: 0.5rem; /* Spacing below the title */
+}
+
+.card-text {
+    font-size: 0.9rem; /* Smaller text for descriptions */
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #c27ba0; /* Custom Etsy-like button color */
+    border: none; /* Remove border */
+}
+
+.btn-primary:hover {
+    background-color: #a5638f; /* Darker shade on hover */
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+    .col-md-4 {
+        margin-bottom: 2rem; /* Space between cards on smaller screens */
+    }
+}

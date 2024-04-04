@@ -2,11 +2,9 @@ package com.etsyclone.cart;
 
 import com.etsyclone.cartItem.CartItemDTO;
 
-import com.etsyclone.cart.Cart;
 import com.etsyclone.cartItem.CartItem;
 import com.etsyclone.product.Product;
 import com.etsyclone.cartItem.CartItemRepository;
-import com.etsyclone.cart.CartRepository;
 import com.etsyclone.product.ProductRepository;
 import com.etsyclone.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

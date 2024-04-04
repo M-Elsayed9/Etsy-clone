@@ -144,21 +144,6 @@ public class OrderService {
         return convertToDTO(updatedOrder);
     }
 
-    private Order convertToEntity(OrderDTO dto) {
-        User customer = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.getUserId()));
-
-        Address shippingAddress = addressRepository.findById(dto.getShippingAddress().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + dto.getShippingAddress().getId()));
-
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setAddress(shippingAddress);
-        order.setTotalPrice(calculateTotalPrice(dto.getOrderItems()));
-
-        return order;
-    }
-
     private OrderItem convertToEntity(OrderItemDTO dto) {
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + dto.getProductId()));

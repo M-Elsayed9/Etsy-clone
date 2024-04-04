@@ -6,7 +6,7 @@ import com.etsyclone.role.Role;
 import com.etsyclone.role.RoleName;
 import com.etsyclone.cart.CartService;
 import com.etsyclone.role.RoleService;
-import com.etsyclone.security.jwt.JWTGenerator;
+import com.etsyclone.security.jwt.JwtGenerator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,10 +27,10 @@ public class UserService {
     private final CartService cartService;
     private AuthenticationManager authenticationManager;
     private PasswordEncoder passwordEncoder;
-    private JWTGenerator jwtGenerator;
+    private JwtGenerator jwtGenerator;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleService roleService, CartService cartService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
+    public UserService(UserRepository userRepository, RoleService roleService, CartService cartService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.cartService = cartService;

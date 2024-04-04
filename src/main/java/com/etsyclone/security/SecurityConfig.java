@@ -1,13 +1,12 @@
 package com.etsyclone.security;
 
-import com.etsyclone.security.jwt.JWTAuthenticationFilter;
+import com.etsyclone.security.jwt.JwtAuthenticationFilter;
 import com.etsyclone.security.jwt.JwtAuthEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,8 +36,8 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/home").hasRole("CUSTOMER")
+                        .requestMatchers("/**").permitAll()
+                        //.requestMatchers("/home").hasRole("CUSTOMER")
                         .requestMatchers("/api/users/auth/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/signout", "/auth/register").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
@@ -64,7 +63,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JWTAuthenticationFilter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter();
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
 }

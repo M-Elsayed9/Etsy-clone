@@ -9,6 +9,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -32,7 +34,10 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true, columnDefinition = "VARCHAR(50)", updatable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "category_products",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
     private Set<Product> products = new HashSet<>();
 
     public Category(String name) {
@@ -41,12 +46,10 @@ public class Category {
 
     public void addProduct(Product product) {
         products.add(product);
-        product.getCategories().add(this);
     }
 
     public void removeProduct(Product product) {
         products.remove(product);
-        product.getCategories().remove(this);
     }
 
     @Override

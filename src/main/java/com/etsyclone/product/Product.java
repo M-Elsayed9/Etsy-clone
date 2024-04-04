@@ -65,14 +65,6 @@ public class Product {
     @Column(name = "image_url", columnDefinition = "VARCHAR(255)")
     private String imageUrl;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "product_categories",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> categories = new HashSet<>();
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "seller_id", nullable = false, updatable = false)
     private User seller;
@@ -144,16 +136,6 @@ public class Product {
             return true;
         }
         return false;
-    }
-
-    public void addCategory(Category category) {
-        categories.add(category);
-        category.getProducts().add(this);
-    }
-
-    public void removeCategory(Category category) {
-        categories.remove(category);
-        category.getProducts().remove(this);
     }
 
     @Override
