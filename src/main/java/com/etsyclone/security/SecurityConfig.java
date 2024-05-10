@@ -44,6 +44,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/about").permitAll()
                         .anyRequest().authenticated())
+                .formLogin(form ->
+                        form.loginPage("/auth/login")
+                                .loginProcessingUrl("/auth/login")
+                                .defaultSuccessUrl("/home", true)
+                                .failureUrl("/auth/login?error=true")
+                                .permitAll())
                 .httpBasic(withDefaults());
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

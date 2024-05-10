@@ -26,9 +26,9 @@ public class CartRestController {
         this.cartService = cartService;
     }
 
-    @PostMapping("/{cartId}")
-    public ResponseEntity<CartItemDTO> addCartItem(@PathVariable Long cartId, @RequestBody CartItemDTO cartItemDTO) {
-        CartItemDTO savedCartItemDTO = cartService.addCartItem(cartItemDTO, cartId);
+    @PostMapping("/{cartId}/items/{productId}")
+    public ResponseEntity<CartItemDTO> addCartItem(@PathVariable Long cartId, @RequestBody Long productId) {
+        CartItemDTO savedCartItemDTO = cartService.addCartItem(productId, cartId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCartItemDTO);
     }
 

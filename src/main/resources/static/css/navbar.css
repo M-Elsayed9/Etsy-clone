@@ -1,8 +1,7 @@
     /* Navbar overall styling */
    .navbar {
-       background-color: #f4f4f4; /* Light grey background */
+       background-color: #ffffff; /* Light grey background */
        border-bottom: 1px solid #ddd; /* Light border under the navbar */
-       justify-content: center; /* Center the items in the navbar */
    }
 
     .navbar-brand {
@@ -29,29 +28,24 @@
         color: #fff; /* White text on hover */
     }
 
-    /* Search bar styling */
-    .form-control {
-        border-radius: 20px; /* Rounded corners for the search bar */
-    }
-
     /* Sign in/Sign out and Cart icons */
     .bi {
         margin-right: 8px; /* Add some space before the text */
     }
 
     .bi-cart {
-        color: #c27ba0; /* Matching the theme's color */
+        color: #000000; /* Matching the theme's color */
     }
 
    .search-bar {
-       width: 200%; /* Increase the width of the search bar */
+       width: auto; /* Increase the width of the search bar */
        padding: 12px 20px;
        margin: 8px 0;
-       margin-left: 20px; /* Add space to the left of the search bar */
+       margin-left: 15px; /* Add space to the left of the search bar */
        box-sizing: border-box;
-       border: none;
+       border: 2px solid #000000;
        border-radius: 24px;
-       background-color: #f8f8f8;
+       background-color: #ffffff;
        font-size: 16px;
-       justify-content: center;
    }
+

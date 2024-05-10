@@ -37,35 +37,24 @@ public class CartService {
     }
 
     @Transactional
-    public CartItemDTO addCartItem(CartItemDTO cartItemDTO, Long cartId) {
-        if (cartItemDTO.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
-        }
-
-        Product product = productRepository.findById(cartItemDTO.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+    public CartItemDTO addCartItem(Long productId, Long cartId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found with id: " + cartId));
 
-        Optional<CartItem> existingCartItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().equals(product))
-                .findFirst();
-
-        if (existingCartItem.isPresent()) {
-            CartItem cartItem = existingCartItem.get();
-            cartItem.setQuantity((short) (cartItem.getQuantity() + cartItemDTO.getQuantity()));
-            CartItem savedCartItem = cartItemRepository.save(cartItem);
-            cart.updateItem(savedCartItem);
-            return convertToDTO(savedCartItem);
+        Optional<CartItem> cartItemOptional = cartItemRepository.findByCart_IdAndProduct_Id(cartId, productId);
+        CartItem cartItem;
+        if (cartItemOptional.isPresent()) {
+            cartItem = cartItemOptional.get();
+            cartItem.setQuantity((short) (cartItem.getQuantity() + 1));
         } else {
-            CartItem cartItem = new CartItem();
-            cartItem.setProduct(product);
-            cartItem.setCart(cart);
-            cartItem.setQuantity(cartItemDTO.getQuantity());
-            CartItem savedCartItem = cartItemRepository.save(cartItem);
-            cart.addItem(savedCartItem);
-            return convertToDTO(savedCartItem);
+            cartItem = new CartItem(cart, product, (short) 1);
         }
+
+        CartItem savedCartItem = cartItemRepository.save(cartItem);
+        cart.addItem(savedCartItem);
+        return convertToDTO(savedCartItem);
     }
 
     @Transactional(readOnly = true)

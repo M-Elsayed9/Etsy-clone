@@ -11,13 +11,15 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ProductDTO {
 
+    private Long id;
     private String name;
     private String description;
     private BigDecimal price;
     private Integer stock;
     private String imageUrl;
 
-    public ProductDTO(String name, String description, BigDecimal price, Integer stock, String imageUrl) {
+    public ProductDTO(Long id, String name, String description, BigDecimal price, Integer stock, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;

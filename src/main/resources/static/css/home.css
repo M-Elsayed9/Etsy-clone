@@ -1,20 +1,16 @@
-/* home.css content */
-
-/* General body styling */
 body {
-    background-color: #f8f8f8; /* Soft background color */
-    color: #333; /* Primary text color */
+    font-family: Arial, sans-serif;
 }
 
-/* Card styling */
+/* Card styling to align with form styling */
 .card {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border: none; /* Remove default border */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow, similar to form */
+    border: 1px solid #ddd; /* Light border similar to form inputs */
     transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover effect */
 }
 
 .card:hover {
-    transform: translateY(-5px); /* Slightly lift the card on hover */
+    transform: translateY(-5px); /* Lift the card on hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
 }
 
@@ -25,31 +21,31 @@ body {
 }
 
 .card-body {
-    padding: 1rem; /* Spacing inside the card */
+    padding: 20px; /* Consistent padding with form container */
 }
 
 .card-title {
-    color: #333; /* Title color */
-    margin-bottom: 0.5rem; /* Spacing below the title */
+    color: #333; /* Text color consistent with form labels */
+    margin-bottom: 0.5rem;
 }
 
 .card-text {
-    font-size: 0.9rem; /* Smaller text for descriptions */
+    font-size: 0.9rem; /* Similar to form input text size */
 }
 
-/* Button styling */
+/* Button styling to align with form submit button */
 .btn-primary {
-    background-color: #c27ba0; /* Custom Etsy-like button color */
-    border: none; /* Remove border */
+    background-color: #4CAF50; /* Primary button color consistent with form */
+    border: none; /* No border, consistent with form button */
 }
 
 .btn-primary:hover {
-    background-color: #a5638f; /* Darker shade on hover */
+    background-color: #45a049; /* Slightly darker shade on hover */
 }
 
-/* Responsive grid adjustments */
+/* Responsive adjustments for consistent layout */
 @media (max-width: 768px) {
     .col-md-4 {
-        margin-bottom: 2rem; /* Space between cards on smaller screens */
+        margin-bottom: 2rem; /* Increased space between items on smaller screens */
     }
 }

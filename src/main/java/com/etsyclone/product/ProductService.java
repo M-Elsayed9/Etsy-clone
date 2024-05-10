@@ -43,6 +43,15 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public ProductDTO getProduct(String name) {
+        Product product = productRepository.findByName(name);
+        if (product == null) {
+            throw new RuntimeException("Product not found with name " + name);
+        }
+        return convertToDTO(product);
+    }
+
+    @Transactional(readOnly = true)
     public List<ProductDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
@@ -84,6 +93,7 @@ public class ProductService {
 
     private ProductDTO convertToDTO(Product product) {
         return new ProductDTO(
+                product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),

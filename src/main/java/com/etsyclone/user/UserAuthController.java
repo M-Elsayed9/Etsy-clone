@@ -1,5 +1,7 @@
 package com.etsyclone.user;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import static com.etsyclone.security.jwt.JwtGenerator.JWT_EXPIRATION;
 
 @Controller
 @RequestMapping("/auth")
@@ -27,16 +31,25 @@ public class UserAuthController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute UserDTO userDTO, RedirectAttributes redirectAttributes) {
+    public String loginUser(@ModelAttribute UserDTO userDTO, RedirectAttributes redirectAttributes, HttpServletResponse response) {
         try {
-            String token = userService.login(userDTO);
+            String token = userService.login(userDTO); // This should internally use JwtGenerator to create the token
+
+            // Create cookie with JWT
+            Cookie jwtCookie = new Cookie("jwt", token);
+            jwtCookie.setHttpOnly(true); // Make cookie inaccessible to client-side scripts
+            jwtCookie.setPath("/"); // Cookie is available for all paths
+            jwtCookie.setMaxAge((int) JWT_EXPIRATION / 1000); // Set cookie expiration
+            response.addCookie(jwtCookie); // Add cookie to the response
+
             redirectAttributes.addFlashAttribute("success", "Login successful");
-            return "redirect:/home";
+            return "redirect:/home"; // Redirect to home or another secure page
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Login failed: " + e.getMessage());
-            return "redirect:/auth/login";
+            return "redirect:/auth/login"; // Redirect back to the login page on failure
         }
     }
+
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
