@@ -1,4 +1,4 @@
-# Nexus Web Application
+# Etsy Clone Web Application
 
 ## Table of Contents
 - [Project Description](#project-description)
@@ -16,7 +16,7 @@
 #### - Frontend: Thymeleaf, HTML, CSS, JavaScript
 
 ## Features
-#### - Fully functional RESTful API with full CRUD operations
+#### - RESTful API with full CRUD operations
 #### - User authentication and authorization with Spring Security and JWT
 #### - Server Side Rendering
 #### - Using DTOs to transfer data between layers
